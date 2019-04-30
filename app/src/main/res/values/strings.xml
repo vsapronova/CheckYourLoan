@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">CheckYourLoan</string>
+    <string name="loan_amount">Loan amount:</string>
+    <string name="down_payment">Down payment:</string>
+    <string name="interest_rate">Interest rate:</string>
+    <string name="loan_terms">Loan terms(months):</string>
+    <string name="calculate">Calculate</string>
+    <string name="clear">Clear</string>
+    <string name="your_monthly_payment">Your monthly payment:</string>
+</resources>

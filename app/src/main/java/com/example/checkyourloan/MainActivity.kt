@@ -12,35 +12,38 @@ import kotlin.math.round
 
 
 class MainActivity : AppCompatActivity() {
-    lateinit var editText: EditText
-    lateinit var editText2: EditText
-    lateinit var editText3: EditText
-    lateinit var editText4: EditText
-    lateinit var editText5: EditText
-    lateinit var toggleButton: ToggleButton
-    lateinit var toggleButton1: ToggleButton
-    lateinit var toggleButton2: ToggleButton
-    lateinit var toggleButton3: ToggleButton
-//    lateinit var toggleButton4: ToggleButton
+    lateinit var editLoanAmount: EditText
+    lateinit var editDownPayment: EditText
+    lateinit var editInterestRate: EditText
+    lateinit var editLoanTerms: EditText
+    lateinit var editMonthlyPayment: EditText
+    lateinit var toggleLoanAmount: ToggleButton
+    lateinit var toggleDownPayment: ToggleButton
+    lateinit var toggleInterestRate: ToggleButton
+    lateinit var toggleLoanTerms: ToggleButton
+    lateinit var toggleMonthlyPayment: ToggleButton
     lateinit var edits: ArrayList<EditText>
     lateinit var buttons: ArrayList<ToggleButton>
+
+    var selectedParameter = LoanParameter.MONTHLY_PAYMENT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        editText = findViewById(R.id.editText)
-        editText2 = findViewById(R.id.editText2)
-        editText3 = findViewById(R.id.editText3)
-        editText4 = findViewById(R.id.editText4)
-        editText5 = findViewById(R.id.editText5)
-        toggleButton = findViewById(R.id.toggleButton1)
-        toggleButton1 = findViewById(R.id.toggleButton2)
-        toggleButton2 = findViewById(R.id.toggleButton3)
-        toggleButton3 = findViewById(R.id.toggleButton4)
+        editLoanAmount = findViewById(R.id.editLoanAmount)
+        editDownPayment = findViewById(R.id.editDownPayment)
+        editInterestRate = findViewById(R.id.editInterestRate)
+        editLoanTerms = findViewById(R.id.editLoanTerms)
+        editMonthlyPayment = findViewById(R.id.editMonthlyPayment)
+        toggleLoanAmount = findViewById(R.id.toggleLoanAmount)
+        toggleDownPayment = findViewById(R.id.toggleDownPayment)
+        toggleInterestRate = findViewById(R.id.toggleInterestRate)
+        toggleLoanTerms = findViewById(R.id.toggleLoanTerms)
+        toggleMonthlyPayment = findViewById(R.id.toggleMonthlyPayment)
 
-        buttons = arrayListOf(toggleButton, toggleButton1, toggleButton2, toggleButton3)
-        edits = arrayListOf(editText, editText2, editText3, editText4)
+        buttons = arrayListOf(toggleLoanAmount, toggleDownPayment, toggleInterestRate, toggleLoanTerms, toggleMonthlyPayment)
+        edits = arrayListOf(editLoanAmount, editDownPayment, editInterestRate, editLoanTerms, editMonthlyPayment)
 
         for (button in buttons) {
             button.setOnCheckedChangeListener(checkedChangeListener)
@@ -49,8 +52,22 @@ class MainActivity : AppCompatActivity() {
         for (edit in edits) edit.addTextChangedListener(editListener)
     }
 
-    val checkedChangeListener = { button: CompoundButton, isChecked: Boolean ->
-        button.text = if (isChecked) "ON" else "OFF"
+    val checkedChangeListener = { checkedButton: CompoundButton, isChecked: Boolean ->
+        if (isChecked) {
+            checkedButton.text = if (isChecked) "ON" else "OFF"
+
+            for (button in buttons) {
+                if (button != checkedButton) {
+                    button.isChecked = false
+                }
+            }
+
+            TODO("Disable selected edit and toggle")
+
+            TODO("Set selectedParameter here")
+
+            TODO("Trigger calculate?")
+        }
     }
 
     val editListener = object: TextWatcher {
@@ -61,6 +78,14 @@ class MainActivity : AppCompatActivity() {
         override fun afterTextChanged(s: Editable) {
             calculateListener()
         }
+    }
+
+    enum class LoanParameter(val value: Int) {
+        LOAN_AMOUNT(0),
+        DOWN_PAYMENT(1),
+        INTEREST_RATE(2),
+        LOAN_TERMS(3),
+        MONTHLY_PAYMENT(4),
     }
 
     fun calculateMonthlyPayment(loanAmount: Double, downPayment: Double, interestRate: Double, loanTerms: Double): Double {
@@ -80,16 +105,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun calculateListener() {
-        val loanAmount = getDouble(editText)
-        val downPayment = getDouble(editText2)
-        val interestRate = getDouble(editText3)
-        val loanTerms = getDouble(editText4)
+        val loanAmount = getDouble(editLoanAmount)
+        val downPayment = getDouble(editDownPayment)
+        val interestRate = getDouble(editInterestRate)
+        val loanTerms = getDouble(editLoanTerms)
+        val monthlyPayment = getDouble(editMonthlyPayment)
 
-        if (loanAmount != null && downPayment != null && interestRate != null && loanTerms != null) {
-            val payment = calculateMonthlyPayment(loanAmount, downPayment, interestRate, loanTerms)
-            editText5.setText(payment.toString())
-        } else {
-            editText5.setText("")
-        }
+        val value: Double? =
+            when(selectedParameter) {
+                LoanParameter.MONTHLY_PAYMENT -> {
+                        if (loanAmount != null && downPayment != null && interestRate != null && loanTerms != null) {
+                            calculateMonthlyPayment(loanAmount, downPayment, interestRate, loanTerms)
+                        } else {
+                            null
+                        }
+                }
+                else -> null
+            }
+        val edit = edits[selectedParameter.value]
+        edit.setText(value?.toString() ?: "")
+
     }
 }

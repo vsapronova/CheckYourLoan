@@ -10,7 +10,7 @@
             android:text="@string/loan_amount"
             android:layout_width="0dp"
             android:layout_height="30dp"
-            android:id="@+id/textView" app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
+            android:id="@+id/textLoanAmount" app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp" android:layout_marginTop="10dp" app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="16dp" android:layout_marginRight="16dp"
             app:layout_constraintHorizontal_bias="0.036" android:textSize="20sp" android:textStyle="bold"
@@ -21,22 +21,22 @@
             android:inputType="numberDecimal"
             android:ems="10"
             android:textStyle="bold"
-            android:id="@+id/editText"
+            android:id="@+id/editLoanAmount"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
             android:textSize="20sp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="16dp"
             app:layout_constraintHorizontal_bias="0.562" android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:layout_constraintTop_toBottomOf="@+id/textLoanAmount"
             tools:ignore="Autofill"/>
     <TextView
             android:text="@string/down_payment"
             android:layout_width="0dp"
             android:layout_height="30dp"
-            android:id="@+id/textView2" android:textSize="20sp"
+            android:id="@+id/textDownPayment" android:textSize="20sp"
             android:textStyle="bold" android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/editText" android:layout_marginStart="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/editLoanAmount" android:layout_marginStart="16dp"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
             android:layout_marginEnd="16dp" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginRight="16dp" android:textColor="#673AB7"/>
@@ -46,16 +46,16 @@
             android:inputType="numberDecimal"
             android:ems="10"
             tools:ignore="Autofill"
-            android:id="@+id/editText2"
+            android:id="@+id/editDownPayment"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp" android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/textView2" android:textSize="20sp" android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/textDownPayment" android:textSize="20sp" android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"/>
     <TextView
             android:layout_width="0dp" android:layout_height="30dp"
             android:text="@string/interest_rate"
-            android:id="@+id/textView3"
+            android:id="@+id/textInterestRate"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -63,7 +63,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginEnd="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/editText2"
+            app:layout_constraintTop_toBottomOf="@+id/editDownPayment"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
             android:textColor="#673AB7"/>
     <EditText
@@ -72,16 +72,16 @@
             android:inputType="numberDecimal"
             android:ems="10"
             tools:ignore="Autofill"
-            android:id="@+id/editText3"
+            android:id="@+id/editInterestRate"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp" android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/textView3" android:textSize="20sp" android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/textInterestRate" android:textSize="20sp" android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"/>
     <TextView
             android:layout_width="0dp" android:layout_height="30dp"
             android:text="@string/loan_terms"
-            android:id="@+id/textView4"
+            android:id="@+id/textLoanTerms"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -89,7 +89,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginEnd="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/editText3"
+            app:layout_constraintTop_toBottomOf="@+id/editInterestRate"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
             android:textColor="#673AB7"/>
     <EditText
@@ -98,58 +98,72 @@
             android:inputType="numberDecimal"
             android:ems="10"
             tools:ignore="Autofill"
-            android:id="@+id/editText4"
+            android:id="@+id/editLoanTerms"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp" android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/textView4" android:textSize="20sp" android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/textLoanTerms" android:textSize="20sp" android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"/>
     <TextView
             android:text="@string/your_monthly_payment"
-            android:layout_width="279dp"
-            android:layout_height="37dp"
-            android:id="@+id/textView5" app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="16dp"
+            android:layout_width="0dp" android:layout_height="30dp"
+            android:id="@+id/textMontlyPayment" android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/editText4"
-            android:textSize="25sp" android:textStyle="bold"
-            android:layout_marginTop="16dp" android:textColor="#673AB7"/>
+            android:layout_marginEnd="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/editLoanTerms"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
+            android:textColor="#673AB7"/>
     <EditText
-            android:layout_width="137dp"
-            android:layout_height="56dp"
-            android:id="@+id/editText5" android:textSize="30sp"
-            android:layout_marginTop="24dp" app:layout_constraintTop_toBottomOf="@+id/textView5"
-            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp" android:layout_marginRight="8dp"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"/>
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            tools:ignore="Autofill"
+            android:id="@+id/editMonthlyPayment"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp" android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/textMontlyPayment" android:textSize="20sp" android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"/>
     <ToggleButton
             android:text="@string/togglebutton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/toggleButton1" android:layout_marginEnd="16dp" android:layout_marginRight="16dp"
+            android:id="@+id/toggleLoanAmount" android:layout_marginEnd="16dp" android:layout_marginRight="16dp"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="12dp"
-            app:layout_constraintTop_toBottomOf="@+id/textView"/>
+            app:layout_constraintTop_toBottomOf="@+id/textLoanAmount"/>
     <ToggleButton
             android:text="@string/togglebutton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/toggleButton2" android:layout_marginEnd="16dp" android:layout_marginRight="16dp"
+            android:id="@+id/toggleDownPayment" android:layout_marginEnd="16dp" android:layout_marginRight="16dp"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="12dp"
-            app:layout_constraintTop_toBottomOf="@+id/textView2"/>
+            app:layout_constraintTop_toBottomOf="@+id/textDownPayment"/>
     <ToggleButton
             android:text="@string/togglebutton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/toggleButton3" android:layout_marginEnd="16dp" android:layout_marginRight="16dp"
+            android:id="@+id/toggleInterestRate" android:layout_marginEnd="16dp" android:layout_marginRight="16dp"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="12dp"
-            app:layout_constraintTop_toBottomOf="@+id/textView3"/>
+            app:layout_constraintTop_toBottomOf="@+id/textInterestRate"/>
     <ToggleButton
             android:text="@string/togglebutton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/toggleButton4" android:layout_marginEnd="16dp" android:layout_marginRight="16dp"
+            android:id="@+id/toggleLoanTerms" android:layout_marginEnd="16dp" android:layout_marginRight="16dp"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="12dp"
-            app:layout_constraintTop_toBottomOf="@+id/textView4"/>
+            app:layout_constraintTop_toBottomOf="@+id/textLoanTerms"/>
+    <ToggleButton
+            android:text="@string/togglebutton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/toggleMonthlyPayment" android:layout_marginEnd="16dp" android:layout_marginRight="16dp"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="12dp"
+            app:layout_constraintTop_toBottomOf="@+id/textMontlyPayment"/>
 
 
 

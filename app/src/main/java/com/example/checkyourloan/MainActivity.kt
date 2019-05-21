@@ -7,6 +7,8 @@ import android.text.TextWatcher
 import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.ToggleButton
+import kotlin.math.abs
+import kotlin.math.log
 import kotlin.math.pow
 import kotlin.math.round
 
@@ -25,7 +27,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var edits: ArrayList<EditText>
     lateinit var buttons: ArrayList<ToggleButton>
 
-    var selectedParameter = LoanParameter.MONTHLY_PAYMENT
+    lateinit var selectedParameter: LoanParameter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,38 +47,47 @@ class MainActivity : AppCompatActivity() {
         buttons = arrayListOf(toggleLoanAmount, toggleDownPayment, toggleInterestRate, toggleLoanTerms, toggleMonthlyPayment)
         edits = arrayListOf(editLoanAmount, editDownPayment, editInterestRate, editLoanTerms, editMonthlyPayment)
 
-        for (button in buttons) {
-            button.setOnCheckedChangeListener(checkedChangeListener)
+        for (button in buttons) button.setOnCheckedChangeListener(checkedChangeListener)
+        for (edit in edits) edit.addTextChangedListener(EditWatcher(edit))
+
+        selectParameter(LoanParameter.MONTHLY_PAYMENT)
+    }
+
+    fun setParameterState(param: LoanParameter, calc: Boolean) {
+        val button = buttons[param.value]
+        button.isEnabled = !calc
+        button.isChecked = calc
+
+        edits[param.value].isEnabled = !calc
+    }
+
+    fun selectParameter(param: LoanParameter) {
+        selectedParameter = param
+
+        LoanParameter.values().forEach {
+            setParameterState(it, calc = selectedParameter == it)
         }
 
-        for (edit in edits) edit.addTextChangedListener(editListener)
+        calculateListener()
     }
 
     val checkedChangeListener = { checkedButton: CompoundButton, isChecked: Boolean ->
         if (isChecked) {
-            checkedButton.text = if (isChecked) "ON" else "OFF"
-
-            for (button in buttons) {
-                if (button != checkedButton) {
-                    button.isChecked = false
-                }
-            }
-
-            TODO("Disable selected edit and toggle")
-
-            TODO("Set selectedParameter here")
-
-            TODO("Trigger calculate?")
+            val index = buttons.indexOf(checkedButton)
+            val parameter = LoanParameter.values().find { it.value == index } !!
+            selectParameter(parameter)
         }
     }
 
-    val editListener = object: TextWatcher {
+    inner class EditWatcher(val edit: EditText): TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
         override fun afterTextChanged(s: Editable) {
-            calculateListener()
+            if (edit != edits[selectedParameter.value]) {
+                calculateListener()
+            }
         }
     }
 
@@ -91,8 +102,64 @@ class MainActivity : AppCompatActivity() {
     fun calculateMonthlyPayment(loanAmount: Double, downPayment: Double, interestRate: Double, loanTerms: Double): Double {
         val finalAmount = loanAmount - downPayment
         val monthlyRate = interestRate / 12 / 100
-        var result = (finalAmount * monthlyRate) / (1 - (1 + monthlyRate).pow(-loanTerms))
-        return round(result)
+        var resultMonthlyPayment = (finalAmount * monthlyRate) / (1 - (1 + monthlyRate).pow(-loanTerms))
+        return resultMonthlyPayment
+    }
+
+    fun calculateLoanAmount(downPayment: Double, interestRate: Double, loanTerms: Double, monthlyPayment: Double): Double {
+        val monthlyRate = interestRate / 12 / 100
+        var resultLoanAmount = (monthlyPayment*(1-(1+monthlyRate).pow(-loanTerms)))/monthlyRate + downPayment
+        return resultLoanAmount
+    }
+
+    fun calculateDownPayment(loanAmount: Double, interestRate: Double, loanTerms: Double, monthlyPayment: Double): Double {
+        val monthlyRate = interestRate / 12 / 100
+        var resultDownPayment = loanAmount - (monthlyPayment*(1-(1+monthlyRate).pow(-loanTerms)))/monthlyRate
+        return resultDownPayment
+    }
+
+    fun calculateLoanTerm(loanAmount: Double, downPayment: Double, interestRate: Double, monthlyPayment: Double): Double {
+        val finalAmount = loanAmount - downPayment
+        val monthlyRate = interestRate / 12 / 100
+        var resultLoanTerm = -log((1 - (finalAmount*monthlyRate)/monthlyPayment), 1+monthlyRate)
+        return resultLoanTerm
+    }
+
+    fun calculateInterestRate(loanAmount: Double, downPayment: Double, loanTerms: Double, monthlyPayment: Double): Double {
+        fun monthly(rate: Double) = calculateMonthlyPayment(loanAmount, downPayment, rate, loanTerms)
+
+        var step = 5.0
+        var r0 = 0.1
+        var r1 = 0.1
+
+        var monthlyr0 = monthly(r0)
+        var monthlyr1 = monthly(r1)
+
+        while ( !(monthlyr0 < monthlyPayment && monthlyr1 > monthlyPayment) ) {
+            if (monthlyr0 > monthlyPayment) {
+                r1 = r0
+                r0 -= step
+            }
+            else if (monthlyr1 < monthlyPayment) {
+                r0 = r1
+                r1 += step
+            }
+            monthlyr0 = monthly(r0)
+            monthlyr1 = monthly(r1)
+        }
+
+        while ( abs(monthlyPayment-monthlyr0) > 0.0001) {
+            val middle = r0 + (r1 - r0) / 2
+            val monthlymid = monthly(middle)
+            if (monthlyPayment < monthlymid) {
+                r1 = middle
+            } else {
+                r0 = middle
+            }
+            monthlyr0 = monthly(r0)
+        }
+
+        return r0
     }
 
     fun getDouble(edit: EditText): Double? {
@@ -120,10 +187,38 @@ class MainActivity : AppCompatActivity() {
                             null
                         }
                 }
-                else -> null
+                LoanParameter.DOWN_PAYMENT -> {
+                    if (loanAmount != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
+                        calculateDownPayment(loanAmount, interestRate, loanTerms, monthlyPayment)
+                    } else {
+                        null
+                    }
+                }
+                LoanParameter.LOAN_AMOUNT -> {
+                    if (downPayment != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
+                        calculateLoanAmount(downPayment, interestRate, loanTerms, monthlyPayment)
+                    } else {
+                        null
+                    }
+                }
+                LoanParameter.LOAN_TERMS -> {
+                    if (downPayment != null && interestRate != null && loanAmount != null && monthlyPayment != null) {
+                        calculateLoanTerm(loanAmount, downPayment, interestRate, monthlyPayment)
+                    } else {
+                        null
+                    }
+                }
+                LoanParameter.INTEREST_RATE -> {
+                    if (loanAmount != null && downPayment != null && loanTerms != null && monthlyPayment != null) {
+                        calculateInterestRate(loanAmount, downPayment, loanTerms, monthlyPayment)
+                    } else {
+                        null
+                    }
+                }
             }
-        val edit = edits[selectedParameter.value]
-        edit.setText(value?.toString() ?: "")
 
+        val rounded = if (value != null) round(value) else null
+        val edit = edits[selectedParameter.value]
+        edit.setText(rounded?.toString() ?: "")
     }
 }

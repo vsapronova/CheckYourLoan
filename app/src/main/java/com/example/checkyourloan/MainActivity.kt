@@ -7,10 +7,11 @@ import android.text.TextWatcher
 import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.ToggleButton
-import kotlin.math.abs
-import kotlin.math.log
-import kotlin.math.pow
 import kotlin.math.round
+import android.text.Spanned
+import android.text.SpannableString
+import android.text.style.ImageSpan
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -44,8 +45,18 @@ class MainActivity : AppCompatActivity() {
         toggleLoanTerms = findViewById(R.id.toggleLoanTerms)
         toggleMonthlyPayment = findViewById(R.id.toggleMonthlyPayment)
 
+    fun changeToggleImage(toggleButton: ToggleButton, isChecked: Boolean) {
+        val button = toggleLoanAmount
+        val imageSpan = ImageSpan(this, android.R.drawable.ic_lock_lock)
+        val content = SpannableString("X")
+        content.setSpan(imageSpan, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        button.text = content
+        button.textOn = content
+        button.textOff = content
+    }
         buttons = arrayListOf(toggleLoanAmount, toggleDownPayment, toggleInterestRate, toggleLoanTerms, toggleMonthlyPayment)
         edits = arrayListOf(editLoanAmount, editDownPayment, editInterestRate, editLoanTerms, editMonthlyPayment)
+
 
         for (button in buttons) button.setOnCheckedChangeListener(checkedChangeListener)
         for (edit in edits) edit.addTextChangedListener(EditWatcher(edit))
@@ -99,69 +110,6 @@ class MainActivity : AppCompatActivity() {
         MONTHLY_PAYMENT(4),
     }
 
-    fun calculateMonthlyPayment(loanAmount: Double, downPayment: Double, interestRate: Double, loanTerms: Double): Double {
-        val finalAmount = loanAmount - downPayment
-        val monthlyRate = interestRate / 12 / 100
-        var resultMonthlyPayment = (finalAmount * monthlyRate) / (1 - (1 + monthlyRate).pow(-loanTerms))
-        return resultMonthlyPayment
-    }
-
-    fun calculateLoanAmount(downPayment: Double, interestRate: Double, loanTerms: Double, monthlyPayment: Double): Double {
-        val monthlyRate = interestRate / 12 / 100
-        var resultLoanAmount = (monthlyPayment*(1-(1+monthlyRate).pow(-loanTerms)))/monthlyRate + downPayment
-        return resultLoanAmount
-    }
-
-    fun calculateDownPayment(loanAmount: Double, interestRate: Double, loanTerms: Double, monthlyPayment: Double): Double {
-        val monthlyRate = interestRate / 12 / 100
-        var resultDownPayment = loanAmount - (monthlyPayment*(1-(1+monthlyRate).pow(-loanTerms)))/monthlyRate
-        return resultDownPayment
-    }
-
-    fun calculateLoanTerm(loanAmount: Double, downPayment: Double, interestRate: Double, monthlyPayment: Double): Double {
-        val finalAmount = loanAmount - downPayment
-        val monthlyRate = interestRate / 12 / 100
-        var resultLoanTerm = -log((1 - (finalAmount*monthlyRate)/monthlyPayment), 1+monthlyRate)
-        return resultLoanTerm
-    }
-
-    fun calculateInterestRate(loanAmount: Double, downPayment: Double, loanTerms: Double, monthlyPayment: Double): Double {
-        fun monthly(rate: Double) = calculateMonthlyPayment(loanAmount, downPayment, rate, loanTerms)
-
-        var step = 5.0
-        var r0 = 0.1
-        var r1 = 0.1
-
-        var monthlyr0 = monthly(r0)
-        var monthlyr1 = monthly(r1)
-
-        while ( !(monthlyr0 < monthlyPayment && monthlyr1 > monthlyPayment) ) {
-            if (monthlyr0 > monthlyPayment) {
-                r1 = r0
-                r0 -= step
-            }
-            else if (monthlyr1 < monthlyPayment) {
-                r0 = r1
-                r1 += step
-            }
-            monthlyr0 = monthly(r0)
-            monthlyr1 = monthly(r1)
-        }
-
-        while ( abs(monthlyPayment-monthlyr0) > 0.0001) {
-            val middle = r0 + (r1 - r0) / 2
-            val monthlymid = monthly(middle)
-            if (monthlyPayment < monthlymid) {
-                r1 = middle
-            } else {
-                r0 = middle
-            }
-            monthlyr0 = monthly(r0)
-        }
-
-        return r0
-    }
-
     fun getDouble(edit: EditText): Double? {
         if (edit.text.length > 0) {
             return edit.text.toString().toDouble()
@@ -178,47 +126,97 @@ class MainActivity : AppCompatActivity() {
         val loanTerms = getDouble(editLoanTerms)
         val monthlyPayment = getDouble(editMonthlyPayment)
 
+        val loan = Loan(loanAmount, downPayment, interestRate, loanTerms, monthlyPayment)
+
         val value: Double? =
             when(selectedParameter) {
                 LoanParameter.MONTHLY_PAYMENT -> {
-                        if (loanAmount != null && downPayment != null && interestRate != null && loanTerms != null) {
-                            calculateMonthlyPayment(loanAmount, downPayment, interestRate, loanTerms)
-                        } else {
-                            null
-                        }
+                    getMonthlyPayment(loanAmount, downPayment, interestRate, loanTerms)
                 }
                 LoanParameter.DOWN_PAYMENT -> {
-                    if (loanAmount != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
-                        calculateDownPayment(loanAmount, interestRate, loanTerms, monthlyPayment)
-                    } else {
-                        null
-                    }
+                    getDownPayment(loanAmount, interestRate, loanTerms, monthlyPayment)
                 }
                 LoanParameter.LOAN_AMOUNT -> {
-                    if (downPayment != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
-                        calculateLoanAmount(downPayment, interestRate, loanTerms, monthlyPayment)
-                    } else {
-                        null
-                    }
+                    getLoanAmount(downPayment, interestRate, loanTerms, monthlyPayment)
                 }
                 LoanParameter.LOAN_TERMS -> {
-                    if (downPayment != null && interestRate != null && loanAmount != null && monthlyPayment != null) {
-                        calculateLoanTerm(loanAmount, downPayment, interestRate, monthlyPayment)
-                    } else {
-                        null
-                    }
+                    getLoanTerms(downPayment, interestRate, loanAmount, monthlyPayment)
                 }
                 LoanParameter.INTEREST_RATE -> {
-                    if (loanAmount != null && downPayment != null && loanTerms != null && monthlyPayment != null) {
-                        calculateInterestRate(loanAmount, downPayment, loanTerms, monthlyPayment)
-                    } else {
-                        null
-                    }
+                    getInterestRate(loan)
                 }
             }
 
         val rounded = if (value != null) round(value) else null
         val edit = edits[selectedParameter.value]
         edit.setText(rounded?.toString() ?: "")
+    }
+
+    class Loan (
+        var loanAmount: Double?,
+        var downPayment: Double?,
+        var loanTerms: Double?,
+        var monthlyPayment: Double?,
+        var interestRate: Double?
+    )
+
+    fun getInterestRate(loan: Loan): Double? {
+        return if (loan.loanAmount != null && loan.downPayment != null && loan.loanTerms != null && loan.monthlyPayment != null) {
+            calculateInterestRate(loan.loanAmount!!, loan.downPayment!!, loan.loanTerms!!, loan.monthlyPayment!!)
+        } else {
+            null
+        }
+    }
+
+    fun getLoanTerms(
+        downPayment: Double?,
+        interestRate: Double?,
+        loanAmount: Double?,
+        monthlyPayment: Double?
+    ): Double? {
+        return if (downPayment != null && interestRate != null && loanAmount != null && monthlyPayment != null) {
+            calculateLoanTerm(loanAmount, downPayment, interestRate, monthlyPayment)
+        } else {
+            null
+        }
+    }
+
+    fun getLoanAmount(
+        downPayment: Double?,
+        interestRate: Double?,
+        loanTerms: Double?,
+        monthlyPayment: Double?
+    ): Double? {
+        return if (downPayment != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
+            calculateLoanAmount(downPayment, interestRate, loanTerms, monthlyPayment)
+        } else {
+            null
+        }
+    }
+
+    fun getDownPayment(
+        loanAmount: Double?,
+        interestRate: Double?,
+        loanTerms: Double?,
+        monthlyPayment: Double?
+    ): Double? {
+        return if (loanAmount != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
+            calculateDownPayment(loanAmount, interestRate, loanTerms, monthlyPayment)
+        } else {
+            null
+        }
+    }
+
+    fun getMonthlyPayment(
+        loanAmount: Double?,
+        downPayment: Double?,
+        interestRate: Double?,
+        loanTerms: Double?
+    ): Double? {
+        return if (loanAmount != null && downPayment != null && interestRate != null && loanTerms != null) {
+            calculateMonthlyPayment(loanAmount, downPayment, interestRate, loanTerms)
+        } else {
+            null
+        }
     }
 }

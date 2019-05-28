@@ -45,20 +45,15 @@ class MainActivity : AppCompatActivity() {
         toggleLoanTerms = findViewById(R.id.toggleLoanTerms)
         toggleMonthlyPayment = findViewById(R.id.toggleMonthlyPayment)
 
-    fun changeToggleImage(toggleButton: ToggleButton, isChecked: Boolean) {
-        val button = toggleLoanAmount
-        val imageSpan = ImageSpan(this, android.R.drawable.ic_lock_lock)
-        val content = SpannableString("X")
-        content.setSpan(imageSpan, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        button.text = content
-        button.textOn = content
-        button.textOff = content
-    }
+
         buttons = arrayListOf(toggleLoanAmount, toggleDownPayment, toggleInterestRate, toggleLoanTerms, toggleMonthlyPayment)
         edits = arrayListOf(editLoanAmount, editDownPayment, editInterestRate, editLoanTerms, editMonthlyPayment)
 
-
-        for (button in buttons) button.setOnCheckedChangeListener(checkedChangeListener)
+        for (button in buttons) {
+            button.textOn = createImage(android.R.drawable.btn_star_big_on)
+            button.textOff = createImage(android.R.drawable.btn_star_big_off)
+            button.setOnCheckedChangeListener(checkedChangeListener)
+        }
         for (edit in edits) edit.addTextChangedListener(EditWatcher(edit))
 
         selectParameter(LoanParameter.MONTHLY_PAYMENT)
@@ -70,6 +65,13 @@ class MainActivity : AppCompatActivity() {
         button.isChecked = calc
 
         edits[param.value].isEnabled = !calc
+    }
+
+    fun createImage(imageId: Int): SpannableString {
+        val imageSpan = ImageSpan(this, imageId)
+        val content = SpannableString("X")
+        content.setSpan(imageSpan, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        return content
     }
 
     fun selectParameter(param: LoanParameter) {
@@ -131,16 +133,16 @@ class MainActivity : AppCompatActivity() {
         val value: Double? =
             when(selectedParameter) {
                 LoanParameter.MONTHLY_PAYMENT -> {
-                    getMonthlyPayment(loanAmount, downPayment, interestRate, loanTerms)
+                    getMonthlyPayment(loan)
                 }
                 LoanParameter.DOWN_PAYMENT -> {
-                    getDownPayment(loanAmount, interestRate, loanTerms, monthlyPayment)
+                    getDownPayment(loan)
                 }
                 LoanParameter.LOAN_AMOUNT -> {
-                    getLoanAmount(downPayment, interestRate, loanTerms, monthlyPayment)
+                    getLoanAmount(loan)
                 }
                 LoanParameter.LOAN_TERMS -> {
-                    getLoanTerms(downPayment, interestRate, loanAmount, monthlyPayment)
+                    getLoanTerms(loan)
                 }
                 LoanParameter.INTEREST_RATE -> {
                     getInterestRate(loan)
@@ -168,53 +170,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun getLoanTerms(
-        downPayment: Double?,
-        interestRate: Double?,
-        loanAmount: Double?,
-        monthlyPayment: Double?
-    ): Double? {
-        return if (downPayment != null && interestRate != null && loanAmount != null && monthlyPayment != null) {
-            calculateLoanTerm(loanAmount, downPayment, interestRate, monthlyPayment)
+    fun getLoanTerms(loan: Loan): Double? {
+        return if (loan.downPayment != null && loan.interestRate != null && loan.loanAmount != null && loan.monthlyPayment != null) {
+            calculateLoanTerm(loan.loanAmount!!, loan.downPayment!!, loan.interestRate!!, loan.monthlyPayment!!)
         } else {
             null
         }
     }
 
-    fun getLoanAmount(
-        downPayment: Double?,
-        interestRate: Double?,
-        loanTerms: Double?,
-        monthlyPayment: Double?
-    ): Double? {
-        return if (downPayment != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
-            calculateLoanAmount(downPayment, interestRate, loanTerms, monthlyPayment)
+    fun getLoanAmount(loan: Loan): Double? {
+        return if (loan.downPayment != null && loan.interestRate != null && loan.loanTerms != null && loan.monthlyPayment != null) {
+            calculateLoanAmount(loan.downPayment!!, loan.interestRate!!, loan.loanTerms!!, loan.monthlyPayment!!)
         } else {
             null
         }
     }
 
-    fun getDownPayment(
-        loanAmount: Double?,
-        interestRate: Double?,
-        loanTerms: Double?,
-        monthlyPayment: Double?
-    ): Double? {
-        return if (loanAmount != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
-            calculateDownPayment(loanAmount, interestRate, loanTerms, monthlyPayment)
+    fun getDownPayment(loan: Loan): Double? {
+        return if (loan.loanAmount != null && loan.interestRate != null && loan.loanTerms != null && loan.monthlyPayment != null) {
+            calculateDownPayment(loan.loanAmount!!, loan.interestRate!!, loan.loanTerms!!, loan.monthlyPayment!!)
         } else {
             null
         }
     }
 
-    fun getMonthlyPayment(
-        loanAmount: Double?,
-        downPayment: Double?,
-        interestRate: Double?,
-        loanTerms: Double?
-    ): Double? {
-        return if (loanAmount != null && downPayment != null && interestRate != null && loanTerms != null) {
-            calculateMonthlyPayment(loanAmount, downPayment, interestRate, loanTerms)
+    fun getMonthlyPayment(loan: Loan): Double? {
+        return if (loan.loanAmount != null && loan.downPayment != null && loan.interestRate != null && loan.loanTerms != null) {
+            calculateMonthlyPayment(loan.loanAmount!!, loan.downPayment!!, loan.interestRate!!, loan.loanTerms!!)
         } else {
             null
         }

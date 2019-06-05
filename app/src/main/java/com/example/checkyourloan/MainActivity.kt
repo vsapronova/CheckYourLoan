@@ -157,9 +157,9 @@ class MainActivity : AppCompatActivity() {
     class Loan (
         var loanAmount: Double?,
         var downPayment: Double?,
+        var interestRate: Double?,
         var loanTerms: Double?,
-        var monthlyPayment: Double?,
-        var interestRate: Double?
+        var monthlyPayment: Double?
     )
 
     fun getInterestRate(loan: Loan): Double? {

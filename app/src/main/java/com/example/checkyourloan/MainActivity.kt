@@ -11,7 +11,10 @@ import kotlin.math.round
 import android.text.Spanned
 import android.text.SpannableString
 import android.text.style.ImageSpan
-
+import android.view.Menu
+import android.widget.Toolbar
+import java.lang.RuntimeException
+import java.text.DecimalFormatSymbols
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         editLoanAmount = findViewById(R.id.editLoanAmount)
         editDownPayment = findViewById(R.id.editDownPayment)
         editInterestRate = findViewById(R.id.editInterestRate)
@@ -54,10 +58,40 @@ class MainActivity : AppCompatActivity() {
             button.textOff = createImage(android.R.drawable.btn_star_big_off)
             button.setOnCheckedChangeListener(checkedChangeListener)
         }
-        for (edit in edits) edit.addTextChangedListener(EditWatcher(edit))
+        for (edit in edits) {
+            edit.addTextChangedListener(ExperimentalWatcher(edit))
+        }
 
         selectParameter(LoanParameter.MONTHLY_PAYMENT)
     }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.mymenu, menu)
+        return true
+    }
+
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//         Handle presses on the action bar menu items
+//        when (item.itemId) {
+//            R.id.action_cut -> {
+//                text_view.text = "Cut"
+//                return true
+//            }
+//            R.id.action_copy -> {
+//                text_view.text = "Copy"
+//                return true
+//            }
+//            R.id.action_paste -> {
+//                text_view.text = "Paste"
+//                return true
+//            }
+//            R.id.action_new -> {
+//                text_view.text = "New"
+//                return true
+//            }
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 
     fun setParameterState(param: LoanParameter, calc: Boolean) {
         val button = buttons[param.value]
@@ -89,6 +123,64 @@ class MainActivity : AppCompatActivity() {
             val index = buttons.indexOf(checkedButton)
             val parameter = LoanParameter.values().find { it.value == index } !!
             selectParameter(parameter)
+        }
+    }
+
+    inner class ExperimentalWatcher(val edit: EditText): TextWatcher {
+        var killedComma: Int? = null
+        var isProcessing = false
+
+        val thousandsSeparator = ','
+
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+            if (isProcessing) return
+            if (after == 0 && count == 1 && s[start] == thousandsSeparator) {
+                killedComma = start
+            }
+        }
+
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+
+        override fun afterTextChanged(s: Editable) {
+            if (isProcessing) return
+            isProcessing = true
+
+            try {
+                val killedCommaValue = killedComma
+                if (killedCommaValue != null) {
+                    s.delete(killedCommaValue-1, killedCommaValue)
+                    killedComma = null
+                }
+
+                var index = s.length - 1
+                var digitCounter = 0
+                while (index >= 0) {
+                    val ch = s.get(index)
+                    when(ch) {
+                        in '0'..'9' ->
+                            if (digitCounter == 3) {
+                                s.insert(index+1, thousandsSeparator.toString())
+                                digitCounter = 0
+                            } else {
+                                digitCounter++
+                                index--
+                            }
+                        thousandsSeparator ->
+                            if (digitCounter == 3) {
+                                digitCounter = 0
+                                index--
+                            } else {
+                                s.delete(index, index + 1)
+                                index--
+                            }
+                    }
+                }
+            } catch (ex: RuntimeException) {
+                println(ex.message)
+            }
+
+
+            isProcessing = false
         }
     }
 

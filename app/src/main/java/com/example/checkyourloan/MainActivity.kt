@@ -51,8 +51,8 @@ class MainActivity : AppCompatActivity() {
         edits = arrayListOf(editLoanAmount, editDownPayment, editInterestRate, editLoanTerms, editMonthlyPayment)
 
         for (button in buttons) {
-            button.textOn = createImage(android.R.drawable.btn_star_big_on)
-            button.textOff = createImage(android.R.drawable.btn_star_big_off)
+            button.textOn = createImage(R.drawable.ic_baseline_attach_money_24px)
+            button.textOff = createImage(R.drawable.ic_baseline_attach_money_24px)
             button.setOnCheckedChangeListener(checkedChangeListener)
         }
         for (edit in edits) {

@@ -4,15 +4,12 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.CompoundButton
-import android.widget.EditText
-import android.widget.ToggleButton
 import kotlin.math.round
 import android.text.Spanned
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.Menu
-import android.widget.Toolbar
+import android.widget.*
 import java.lang.RuntimeException
 import java.text.DecimalFormatSymbols
 
@@ -63,12 +60,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         selectParameter(LoanParameter.MONTHLY_PAYMENT)
+
+        val spinner: Spinner = findViewById(R.id.spinnerTerms)
+        val adapter = ArrayAdapter.createFromResource(this, R.array.terms, android.R.layout.simple_spinner_item)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.setAdapter(adapter)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.mymenu, menu)
         return true
     }
+
+
 
 //    override fun onOptionsItemSelected(item: MenuItem): Boolean {
 //         Handle presses on the action bar menu items

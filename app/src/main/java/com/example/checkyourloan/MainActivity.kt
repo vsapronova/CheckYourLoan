@@ -10,8 +10,6 @@ import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.Menu
 import android.widget.*
-import java.lang.RuntimeException
-import java.text.DecimalFormatSymbols
 
 
 class MainActivity : AppCompatActivity() {
@@ -55,9 +53,15 @@ class MainActivity : AppCompatActivity() {
             button.textOff = createImage(R.drawable.ic_baseline_attach_money_24px)
             button.setOnCheckedChangeListener(checkedChangeListener)
         }
-        for (edit in edits) {
-            edit.addTextChangedListener(ExperimentalWatcher(edit))
-        }
+
+        editLoanAmount.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editLoanAmount) }))
+        editDownPayment.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editDownPayment) }))
+
+
+        editDownPayment.addTextChangedListener(EditWatcher(editDownPayment))
+        editInterestRate.addTextChangedListener(EditWatcher(editInterestRate))
+        editLoanTerms.addTextChangedListener(EditWatcher(editLoanTerms))
+        editMonthlyPayment.addTextChangedListener(EditWatcher(editMonthlyPayment))
 
         selectParameter(LoanParameter.MONTHLY_PAYMENT)
 
@@ -130,61 +134,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    inner class ExperimentalWatcher(val edit: EditText): TextWatcher {
-        var killedComma: Int? = null
-        var isProcessing = false
-
-        val thousandsSeparator = ','
-
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            if (isProcessing) return
-            if (after == 0 && count == 1 && s[start] == thousandsSeparator) {
-                killedComma = start
-            }
-        }
-
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-
-        override fun afterTextChanged(s: Editable) {
-            if (isProcessing) return
-            isProcessing = true
-
-            try {
-                val killedCommaValue = killedComma
-                if (killedCommaValue != null) {
-                    s.delete(killedCommaValue-1, killedCommaValue)
-                    killedComma = null
-                }
-
-                var index = s.length - 1
-                var digitCounter = 0
-                while (index >= 0) {
-                    val ch = s.get(index)
-                    when(ch) {
-                        in '0'..'9' ->
-                            if (digitCounter == 3) {
-                                s.insert(index+1, thousandsSeparator.toString())
-                                digitCounter = 0
-                            } else {
-                                digitCounter++
-                                index--
-                            }
-                        thousandsSeparator ->
-                            if (digitCounter == 3) {
-                                digitCounter = 0
-                                index--
-                            } else {
-                                s.delete(index, index + 1)
-                                index--
-                            }
-                    }
-                }
-            } catch (ex: RuntimeException) {
-                println(ex.message)
-            }
-
-
-            isProcessing = false
+    fun editTextChanged(edit: EditText) {
+        if (edit != edits[selectedParameter.value]) {
+            calculateListener()
         }
     }
 
@@ -210,7 +162,9 @@ class MainActivity : AppCompatActivity() {
 
     fun getDouble(edit: EditText): Double? {
         if (edit.text.length > 0) {
-            return edit.text.toString().toDouble()
+            val strValue = edit.text.toString()
+            val cleanStrValue = strValue.replace(",", "")
+            return cleanStrValue.toDouble()
         } else {
 //            edit.setError("Everything is bad!")
             return null

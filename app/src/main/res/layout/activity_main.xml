@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:layout_marginLeft="4dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="1dp"
                 android:orientation="vertical">
             <TextView
                 android:text="@string/loan_amount"
@@ -41,9 +41,8 @@
                 android:digits="0123456789,"
                 android:singleLine="true"
                 android:ems="10"
-                android:textStyle="bold"
                 android:id="@+id/editLoanAmount"
-                android:textSize="20sp"
+                android:textSize="22sp"
                 tools:ignore="Autofill"/>
         </LinearLayout>
     </LinearLayout>
@@ -62,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:layout_marginLeft="4dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="1dp"
                 android:orientation="vertical">
             <TextView
                 android:text="@string/down_payment"
@@ -77,11 +76,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
+                android:digits="0123456789,"
                 android:singleLine="true"
                 android:ems="10"
                 tools:ignore="Autofill"
                 android:id="@+id/editDownPayment"
-                android:textSize="20sp" android:textStyle="bold"
+                android:textSize="22sp"
                 android:layout_weight="1"/>
         </LinearLayout>
     </LinearLayout>
@@ -100,7 +100,7 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:layout_marginLeft="4dp"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="1dp"
             android:orientation="vertical">
             <TextView
                 android:layout_width="match_parent"
@@ -120,7 +120,7 @@
                 android:ems="10"
                 tools:ignore="Autofill"
                 android:id="@+id/editInterestRate"
-                android:textSize="20sp" android:textStyle="bold"/>
+                android:textSize="22sp"/>
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
@@ -128,17 +128,18 @@
             android:layout_width="match_parent"
             android:layout_margin="4dp"
             android:orientation="horizontal">
-    <ToggleButton
+        <ToggleButton
             android:layout_weight="0"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:text="@string/togglebutton"
             android:id="@+id/toggleLoanTerms"/>
         <LinearLayout
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:layout_marginLeft="4dp"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="1dp"
             android:orientation="vertical">
             <TextView
                 android:layout_width="match_parent"
@@ -149,27 +150,24 @@
                 android:gravity="bottom|left"
                 android:textSize="15sp"
                 android:textColor="#673AB7"/>
-            <LinearLayout
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:orientation="horizontal">
-                <EditText
-                    android:layout_weight="1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:singleLine="true"
-                    android:ems="10"
-                    tools:ignore="Autofill"
-                    android:id="@+id/editLoanTerms"
-                    android:textSize="20sp" android:textStyle="bold"/>
-                <Spinner
-                     android:layout_width="120dp"
-                     android:layout_height="56dp"
-                     android:id="@+id/spinnerTerms">
-                </Spinner>
-            </LinearLayout>
+            <EditText
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:singleLine="true"
+                android:ems="10"
+                tools:ignore="Autofill"
+                android:id="@+id/editLoanTerms"
+                android:textSize="22sp"/>
         </LinearLayout>
+        <Spinner
+            android:layout_weight="0"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:gravity="bottom|left"
+            android:id="@+id/spinnerTerms"/>
+
     </LinearLayout>
     <LinearLayout
             android:layout_height="wrap_content"
@@ -186,7 +184,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:layout_marginLeft="4dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="1dp"
                 android:orientation="vertical">
             <TextView
                 android:text="@string/your_monthly_payment"
@@ -202,11 +200,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
+                android:digits="0123456789,"
                 android:singleLine="true"
                 android:ems="10"
                 tools:ignore="Autofill"
                 android:id="@+id/editMonthlyPayment"
-                android:textSize="20sp" android:textStyle="bold"/>
+                android:textSize="22sp"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

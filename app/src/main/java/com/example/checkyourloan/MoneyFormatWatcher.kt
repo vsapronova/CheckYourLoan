@@ -10,6 +10,7 @@ class MoneyFormatWatcher(val changeCallback: () -> Unit): TextWatcher {
     var isProcessing = false
 
     val thousandsSeparator = ','
+    val dot = '.'
 
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
         if (isProcessing) return
@@ -44,6 +45,9 @@ class MoneyFormatWatcher(val changeCallback: () -> Unit): TextWatcher {
                             digitCounter++
                             index--
                         }
+                    dot ->
+                        {digitCounter = 0
+                        index--}
                     thousandsSeparator ->
                         if (digitCounter == 3) {
                             digitCounter = 0

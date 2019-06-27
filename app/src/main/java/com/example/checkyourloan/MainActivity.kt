@@ -49,9 +49,32 @@ class MainActivity : AppCompatActivity() {
         edits = arrayListOf(editLoanAmount, editDownPayment, editInterestRate, editLoanTerms, editMonthlyPayment)
 
         for (button in buttons) {
-            button.textOn = createImage(R.drawable.ic_baseline_attach_money_24px)
-            button.textOff = createImage(R.drawable.ic_baseline_attach_money_24px)
-            button.setOnCheckedChangeListener(checkedChangeListener)
+            if (button == toggleLoanAmount) {
+                button.textOn = createImage(R.drawable.ic_iconfinder_money_bag_309025)
+                button.textOff = createImage(R.drawable.ic_iconfinder_money_bag_309025)
+                button.setOnCheckedChangeListener(checkedChangeListener)
+            }
+            if (button == toggleDownPayment) {
+                button.textOn = createImage(R.drawable.ic_iconfinder_money_box_2639868)
+                button.textOff = createImage(R.drawable.ic_iconfinder_money_box_2639868)
+                button.setOnCheckedChangeListener(checkedChangeListener)
+            }
+            if (button == toggleInterestRate) {
+                button.textOn = createImage(R.drawable.ic_iconfinder_percent_1608788)
+                button.textOff = createImage(R.drawable.ic_iconfinder_percent_1608788)
+                button.setOnCheckedChangeListener(checkedChangeListener)
+            }
+            if (button == toggleLoanTerms) {
+                button.textOn = createImage(R.drawable.ic_iconfinder_gym_2_753128)
+                button.textOff = createImage(R.drawable.ic_iconfinder_gym_2_753128)
+                button.setOnCheckedChangeListener(checkedChangeListener)
+            }
+            if (button == toggleMonthlyPayment) {
+                button.textOn = createImage(R.drawable.ic_iconfinder_money_322468)
+                button.textOff = createImage(R.drawable.ic_iconfinder_money_322468)
+                button.setOnCheckedChangeListener(checkedChangeListener)
+            }
+
         }
 
         editLoanAmount.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editLoanAmount) }))
@@ -199,7 +222,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-        val rounded = if (value != null) round(value) else null
+        val valueOnly = if (value != null && value > 0 && value.isInfinite() == false) value else null
+
+        val rounded = if (valueOnly != null) round(valueOnly) else null
         val edit = edits[selectedParameter.value]
         edit.setText(rounded?.toString() ?: "")
     }

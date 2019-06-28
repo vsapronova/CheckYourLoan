@@ -203,31 +203,18 @@ class MainActivity : AppCompatActivity() {
 
         val loan = Loan(loanAmount, downPayment, interestRate, loanTerms, monthlyPayment)
 
-        val value: Double? =
-            when(selectedParameter) {
-                LoanParameter.MONTHLY_PAYMENT -> {
-                    getMonthlyPayment(loan)
-                }
-                LoanParameter.DOWN_PAYMENT -> {
-                    getDownPayment(loan)
-                }
-                LoanParameter.LOAN_AMOUNT -> {
-                    getLoanAmount(loan)
-                }
-                LoanParameter.LOAN_TERMS -> {
-                    getLoanTerms(loan)
-                }
-                LoanParameter.INTEREST_RATE -> {
-                    getInterestRate(loan)
-                }
-            }
 
+        val value = loan.calcParameter(selectedParameter)
         val valueOnly = if (value != null && value > 0 && value.isInfinite() == false) value else null
 
         val rounded = if (valueOnly != null) round(valueOnly) else null
         val edit = edits[selectedParameter.value]
         edit.setText(rounded?.toString() ?: "")
+
     }
+
+
+
 
     class Loan (
         var loanAmount: Double?,
@@ -235,45 +222,88 @@ class MainActivity : AppCompatActivity() {
         var interestRate: Double?,
         var loanTerms: Double?,
         var monthlyPayment: Double?
-    )
+    ) {
 
-    fun getInterestRate(loan: Loan): Double? {
-        return if (loan.loanAmount != null && loan.downPayment != null && loan.loanTerms != null && loan.monthlyPayment != null) {
-            calculateInterestRate(loan.loanAmount!!, loan.downPayment!!, loan.loanTerms!!, loan.monthlyPayment!!)
-        } else {
-            null
+        fun calcInterestRate(): Double? {
+            interestRate =
+                if (loanAmount != null && downPayment != null && loanTerms != null && monthlyPayment != null) {
+                    calculateInterestRate(loanAmount!!, downPayment!!, loanTerms!!, monthlyPayment!!)
+                } else {
+                    null
+                }
+            return interestRate
         }
-    }
 
-    fun getLoanTerms(loan: Loan): Double? {
-        return if (loan.downPayment != null && loan.interestRate != null && loan.loanAmount != null && loan.monthlyPayment != null) {
-            calculateLoanTerm(loan.loanAmount!!, loan.downPayment!!, loan.interestRate!!, loan.monthlyPayment!!)
-        } else {
-            null
+        fun calcLoanTerms(): Double? {
+            loanTerms =
+                if (downPayment != null && interestRate != null && loanAmount != null && monthlyPayment != null) {
+                    calculateLoanTerm(loanAmount!!, downPayment!!, interestRate!!, monthlyPayment!!)
+                } else {
+                    null
+                }
+            return loanTerms
         }
-    }
 
-    fun getLoanAmount(loan: Loan): Double? {
-        return if (loan.downPayment != null && loan.interestRate != null && loan.loanTerms != null && loan.monthlyPayment != null) {
-            calculateLoanAmount(loan.downPayment!!, loan.interestRate!!, loan.loanTerms!!, loan.monthlyPayment!!)
-        } else {
-            null
+        fun calcLoanAmount(): Double? {
+            loanAmount =
+                if (downPayment != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
+                calculateLoanAmount(downPayment!!, interestRate!!, loanTerms!!, monthlyPayment!!)
+                } else {
+                    null
+                }
+            return loanAmount
         }
-    }
 
-    fun getDownPayment(loan: Loan): Double? {
-        return if (loan.loanAmount != null && loan.interestRate != null && loan.loanTerms != null && loan.monthlyPayment != null) {
-            calculateDownPayment(loan.loanAmount!!, loan.interestRate!!, loan.loanTerms!!, loan.monthlyPayment!!)
-        } else {
-            null
+        fun calcDownPayment(): Double? {
+            downPayment =
+                if (loanAmount != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
+                calculateDownPayment(loanAmount!!, interestRate!!, loanTerms!!, monthlyPayment!!)
+                } else {
+                    null
+                }
+            return downPayment
         }
-    }
 
-    fun getMonthlyPayment(loan: Loan): Double? {
-        return if (loan.loanAmount != null && loan.downPayment != null && loan.interestRate != null && loan.loanTerms != null) {
-            calculateMonthlyPayment(loan.loanAmount!!, loan.downPayment!!, loan.interestRate!!, loan.loanTerms!!)
-        } else {
-            null
+        fun calcMonthlyPayment(): Unit {
+            monthlyPayment =
+                if (loanAmount != null && downPayment != null && interestRate != null && loanTerms != null) {
+                calculateMonthlyPayment(loanAmount!!, downPayment!!, interestRate!!, loanTerms!!)
+                } else {
+                    null
+                }
+
         }
+
+        fun calcParameter(parameter: LoanParameter): Double? {
+            val value: Double? =
+                when (parameter) {
+                    LoanParameter.MONTHLY_PAYMENT -> {
+                        calcMonthlyPayment()
+                        monthlyPayment
+                    }
+                    LoanParameter.DOWN_PAYMENT -> {
+                        calcDownPayment()
+                        downPayment
+
+                    }
+                    LoanParameter.LOAN_AMOUNT -> {
+                        calcLoanAmount()
+                        loanAmount
+
+                    }
+                    LoanParameter.LOAN_TERMS -> {
+                        calcLoanTerms()
+                        loanTerms
+
+                    }
+                    LoanParameter.INTEREST_RATE -> {
+                        calcInterestRate()
+                        interestRate
+
+                    }
+                }
+            return value
+        }
+
     }
 }

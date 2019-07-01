@@ -207,103 +207,32 @@ class MainActivity : AppCompatActivity() {
         val value = loan.calcParameter(selectedParameter)
         val valueOnly = if (value != null && value > 0 && value.isInfinite() == false) value else null
 
-        val rounded = if (valueOnly != null) round(valueOnly) else null
+
+        val rounded = if (valueOnly != null && valueOnly == loanTerms) ("%.2f".format(valueOnly)) else ("%.0f".format(valueOnly))
         val edit = edits[selectedParameter.value]
         edit.setText(rounded?.toString() ?: "")
 
     }
 
+//    fun numbersFormatting(valueOnly) {
+//        when (valueOnly) {
+//            loanAmount -> {
+//                "%.0f".format(valueOnly)
+//            }
+//            downPayment -> {
+//                "%.0f".format(valueOnly)
+//            }
+//            interestRate -> {
+//                "%.2f".format(valueOnly)
+//            }
+//            loanTerms -> {
+//                "%.0f".format(valueOnly)
+//            }
+//            monthlyPayment -> {
+//                "%.2f".format(valueOnly)
+//            }
+//        }
+//    }
 
 
-
-    class Loan (
-        var loanAmount: Double?,
-        var downPayment: Double?,
-        var interestRate: Double?,
-        var loanTerms: Double?,
-        var monthlyPayment: Double?
-    ) {
-
-        fun calcInterestRate(): Double? {
-            interestRate =
-                if (loanAmount != null && downPayment != null && loanTerms != null && monthlyPayment != null) {
-                    calculateInterestRate(loanAmount!!, downPayment!!, loanTerms!!, monthlyPayment!!)
-                } else {
-                    null
-                }
-            return interestRate
-        }
-
-        fun calcLoanTerms(): Double? {
-            loanTerms =
-                if (downPayment != null && interestRate != null && loanAmount != null && monthlyPayment != null) {
-                    calculateLoanTerm(loanAmount!!, downPayment!!, interestRate!!, monthlyPayment!!)
-                } else {
-                    null
-                }
-            return loanTerms
-        }
-
-        fun calcLoanAmount(): Double? {
-            loanAmount =
-                if (downPayment != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
-                calculateLoanAmount(downPayment!!, interestRate!!, loanTerms!!, monthlyPayment!!)
-                } else {
-                    null
-                }
-            return loanAmount
-        }
-
-        fun calcDownPayment(): Double? {
-            downPayment =
-                if (loanAmount != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
-                calculateDownPayment(loanAmount!!, interestRate!!, loanTerms!!, monthlyPayment!!)
-                } else {
-                    null
-                }
-            return downPayment
-        }
-
-        fun calcMonthlyPayment(): Unit {
-            monthlyPayment =
-                if (loanAmount != null && downPayment != null && interestRate != null && loanTerms != null) {
-                calculateMonthlyPayment(loanAmount!!, downPayment!!, interestRate!!, loanTerms!!)
-                } else {
-                    null
-                }
-
-        }
-
-        fun calcParameter(parameter: LoanParameter): Double? {
-            val value: Double? =
-                when (parameter) {
-                    LoanParameter.MONTHLY_PAYMENT -> {
-                        calcMonthlyPayment()
-                        monthlyPayment
-                    }
-                    LoanParameter.DOWN_PAYMENT -> {
-                        calcDownPayment()
-                        downPayment
-
-                    }
-                    LoanParameter.LOAN_AMOUNT -> {
-                        calcLoanAmount()
-                        loanAmount
-
-                    }
-                    LoanParameter.LOAN_TERMS -> {
-                        calcLoanTerms()
-                        loanTerms
-
-                    }
-                    LoanParameter.INTEREST_RATE -> {
-                        calcInterestRate()
-                        interestRate
-
-                    }
-                }
-            return value
-        }
-
-    }
 }

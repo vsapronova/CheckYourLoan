@@ -160,6 +160,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
                 android:singleLine="true"
+                android:digits="0123456789"
                 android:ems="10"
                 tools:ignore="Autofill"
                 android:id="@+id/editLoanTerms"

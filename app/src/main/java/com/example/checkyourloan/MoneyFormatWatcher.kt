@@ -45,9 +45,10 @@ class MoneyFormatWatcher(val changeCallback: () -> Unit): TextWatcher {
                             digitCounter++
                             index--
                         }
-                    dot ->
-                        {digitCounter = 0
-                        index--}
+                    dot -> {
+                        digitCounter = 0
+                        index--
+                    }
                     thousandsSeparator ->
                         if (digitCounter == 3) {
                             digitCounter = 0

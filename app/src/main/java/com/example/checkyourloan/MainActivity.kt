@@ -9,7 +9,10 @@ import android.text.Spanned
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.Menu
+import android.view.View
 import android.widget.*
+import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity() {
@@ -25,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var toggleMonthlyPayment: ToggleButton
     lateinit var edits: ArrayList<EditText>
     lateinit var buttons: ArrayList<ToggleButton>
+    lateinit var spinner: Spinner
 
     lateinit var selectedParameter: LoanParameter
 
@@ -43,9 +47,11 @@ class MainActivity : AppCompatActivity() {
         toggleInterestRate = findViewById(R.id.toggleInterestRate)
         toggleLoanTerms = findViewById(R.id.toggleLoanTerms)
         toggleMonthlyPayment = findViewById(R.id.toggleMonthlyPayment)
+        spinner = findViewById(R.id.spinnerTerms)
 
 
-        buttons = arrayListOf(toggleLoanAmount, toggleDownPayment, toggleInterestRate, toggleLoanTerms, toggleMonthlyPayment)
+        buttons =
+            arrayListOf(toggleLoanAmount, toggleDownPayment, toggleInterestRate, toggleLoanTerms, toggleMonthlyPayment)
         edits = arrayListOf(editLoanAmount, editDownPayment, editInterestRate, editLoanTerms, editMonthlyPayment)
 
         for (button in buttons) {
@@ -86,43 +92,30 @@ class MainActivity : AppCompatActivity() {
         editLoanTerms.addTextChangedListener(EditWatcher(editLoanTerms))
         editMonthlyPayment.addTextChangedListener(EditWatcher(editMonthlyPayment))
 
-        selectParameter(LoanParameter.MONTHLY_PAYMENT)
-
-        val spinner: Spinner = findViewById(R.id.spinnerTerms)
-        val adapter = ArrayAdapter.createFromResource(this, R.array.terms, android.R.layout.simple_spinner_item)
+        val options = arrayOf("months", "years")
+        spinner.selectedItem
+        val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, options)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.setAdapter(adapter)
+
+        selectParameter(LoanParameter.MONTHLY_PAYMENT)
+
+        spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                calculateListener()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
     }
+
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.mymenu, menu)
         return true
     }
-
-
-
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//         Handle presses on the action bar menu items
-//        when (item.itemId) {
-//            R.id.action_cut -> {
-//                text_view.text = "Cut"
-//                return true
-//            }
-//            R.id.action_copy -> {
-//                text_view.text = "Copy"
-//                return true
-//            }
-//            R.id.action_paste -> {
-//                text_view.text = "Paste"
-//                return true
-//            }
-//            R.id.action_new -> {
-//                text_view.text = "New"
-//                return true
-//            }
-//        }
-//        return super.onOptionsItemSelected(item)
-//    }
 
     fun setParameterState(param: LoanParameter, calc: Boolean) {
         val button = buttons[param.value]
@@ -152,7 +145,7 @@ class MainActivity : AppCompatActivity() {
     val checkedChangeListener = { checkedButton: CompoundButton, isChecked: Boolean ->
         if (isChecked) {
             val index = buttons.indexOf(checkedButton)
-            val parameter = LoanParameter.values().find { it.value == index } !!
+            val parameter = LoanParameter.values().find { it.value == index }!!
             selectParameter(parameter)
         }
     }
@@ -163,7 +156,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    inner class EditWatcher(val edit: EditText): TextWatcher {
+    inner class EditWatcher(val edit: EditText) : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
@@ -201,38 +194,60 @@ class MainActivity : AppCompatActivity() {
         val loanTerms = getDouble(editLoanTerms)
         val monthlyPayment = getDouble(editMonthlyPayment)
 
-        val loan = Loan(loanAmount, downPayment, interestRate, loanTerms, monthlyPayment)
+        val selectedTermsUnit = spinner.selectedItem.toString()
+
+        val months = termInMonths(selectedTermsUnit, loanTerms)
+
+        val loan = Loan(loanAmount, downPayment, interestRate, months, monthlyPayment)
 
 
         val value = loan.calcParameter(selectedParameter)
         val valueOnly = if (value != null && value > 0 && value.isInfinite() == false) value else null
 
 
-        val rounded = if (valueOnly != null && valueOnly == loanTerms) ("%.2f".format(valueOnly)) else ("%.0f".format(valueOnly))
+        val rounded =
+            if (valueOnly != null && valueOnly == loanTerms) ("%.2f".format(valueOnly)) else ("%.0f".format(valueOnly))
         val edit = edits[selectedParameter.value]
         edit.setText(rounded?.toString() ?: "")
 
     }
 
-//    fun numbersFormatting(valueOnly) {
-//        when (valueOnly) {
+    fun termInMonths(termsUnit: String, value: Double?): Double? {
+        if (value == null) return null
+        val value =
+            when(termsUnit) {
+                "months" -> {
+                    value
+                }
+                "years" -> {
+                    value * 12
+                }
+
+                else -> {
+                    throw Exception("")
+                }
+            }
+        return value
+    }
+
+//    fun numbersFormatting(value: Double?) {
+//        when (selectedParameter) {
 //            loanAmount -> {
-//                "%.0f".format(valueOnly)
+//                "%.0f".format(value)
 //            }
 //            downPayment -> {
-//                "%.0f".format(valueOnly)
+//                "%.0f".format(value)
 //            }
 //            interestRate -> {
-//                "%.2f".format(valueOnly)
+//                "%.2f".format(value)
 //            }
 //            loanTerms -> {
-//                "%.0f".format(valueOnly)
+//                "%.0f".format(value)
 //            }
 //            monthlyPayment -> {
-//                "%.2f".format(valueOnly)
+//                "%.2f".format(value)
 //            }
 //        }
 //    }
-
-
 }
+

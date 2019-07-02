@@ -4,17 +4,17 @@ class Loan (
     var loanAmount: Double?,
     var downPayment: Double?,
     var interestRate: Double?,
-    var loanTerms: Double?,
+    var loanTermsMonths: Double?,
     var monthlyPayment: Double?
 ) {
 
     fun calcInterestRate(): Double? {
         interestRate =
-            if (loanAmount != null && downPayment != null && loanTerms != null && monthlyPayment != null) {
+            if (loanAmount != null && downPayment != null && loanTermsMonths != null && monthlyPayment != null) {
                 calculateInterestRate(
                     loanAmount!!,
                     downPayment!!,
-                    loanTerms!!,
+                    loanTermsMonths!!,
                     monthlyPayment!!
                 )
             } else {
@@ -24,7 +24,7 @@ class Loan (
     }
 
     fun calcLoanTerms(): Double? {
-        loanTerms =
+        loanTermsMonths =
             if (downPayment != null && interestRate != null && loanAmount != null && monthlyPayment != null) {
                 calculateLoanTerm(
                     loanAmount!!,
@@ -35,16 +35,16 @@ class Loan (
             } else {
                 null
             }
-        return loanTerms
+        return loanTermsMonths
     }
 
     fun calcLoanAmount(): Double? {
         loanAmount =
-            if (downPayment != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
+            if (downPayment != null && interestRate != null && loanTermsMonths != null && monthlyPayment != null) {
                 calculateLoanAmount(
                     downPayment!!,
                     interestRate!!,
-                    loanTerms!!,
+                    loanTermsMonths!!,
                     monthlyPayment!!
                 )
             } else {
@@ -55,11 +55,11 @@ class Loan (
 
     fun calcDownPayment(): Double? {
         downPayment =
-            if (loanAmount != null && interestRate != null && loanTerms != null && monthlyPayment != null) {
+            if (loanAmount != null && interestRate != null && loanTermsMonths != null && monthlyPayment != null) {
                 calculateDownPayment(
                     loanAmount!!,
                     interestRate!!,
-                    loanTerms!!,
+                    loanTermsMonths!!,
                     monthlyPayment!!
                 )
             } else {
@@ -70,12 +70,12 @@ class Loan (
 
     fun calcMonthlyPayment(): Unit {
         monthlyPayment =
-            if (loanAmount != null && downPayment != null && interestRate != null && loanTerms != null) {
+            if (loanAmount != null && downPayment != null && interestRate != null && loanTermsMonths != null) {
                 calculateMonthlyPayment(
                     loanAmount!!,
                     downPayment!!,
                     interestRate!!,
-                    loanTerms!!
+                    loanTermsMonths!!
                 )
             } else {
                 null
@@ -102,7 +102,7 @@ class Loan (
                 }
                 MainActivity.LoanParameter.LOAN_TERMS -> {
                     calcLoanTerms()
-                    loanTerms
+                    loanTermsMonths
 
                 }
                 MainActivity.LoanParameter.INTEREST_RATE -> {

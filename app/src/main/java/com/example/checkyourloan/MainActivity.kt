@@ -4,15 +4,14 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import kotlin.math.round
 import android.text.Spanned
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.Menu
 import android.view.View
 import android.widget.*
-import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.Exception
+import kotlin.math.roundToInt
 
 
 class MainActivity : AppCompatActivity() {
@@ -85,12 +84,11 @@ class MainActivity : AppCompatActivity() {
 
         editLoanAmount.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editLoanAmount) }))
         editDownPayment.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editDownPayment) }))
+        editMonthlyPayment.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editMonthlyPayment) }))
 
 
-        editDownPayment.addTextChangedListener(EditWatcher(editDownPayment))
         editInterestRate.addTextChangedListener(EditWatcher(editInterestRate))
         editLoanTerms.addTextChangedListener(EditWatcher(editLoanTerms))
-        editMonthlyPayment.addTextChangedListener(EditWatcher(editMonthlyPayment))
 
         val options = arrayOf("months", "years")
         spinner.selectedItem
@@ -182,7 +180,6 @@ class MainActivity : AppCompatActivity() {
             val cleanStrValue = strValue.replace(",", "")
             return cleanStrValue.toDouble()
         } else {
-//            edit.setError("Everything is bad!")
             return null
         }
     }
@@ -202,14 +199,35 @@ class MainActivity : AppCompatActivity() {
 
 
         val value = loan.calcParameter(selectedParameter)
-        val valueOnly = if (value != null && value > 0 && value.isInfinite() == false) value else null
 
-
-        val rounded =
-            if (valueOnly != null && valueOnly == loanTerms) ("%.2f".format(valueOnly)) else ("%.0f".format(valueOnly))
+        val strValue = formatValue(value)
         val edit = edits[selectedParameter.value]
-        edit.setText(rounded?.toString() ?: "")
+        edit.setText(strValue)
+    }
 
+    fun formatValue(valueOnly: Double?): String? {
+        val rounded =
+            if (valueOnly != null) {
+                when (selectedParameter) {
+                    LoanParameter.LOAN_AMOUNT -> {
+                        valueOnly.roundToInt().toString()
+                    }
+                    LoanParameter.DOWN_PAYMENT -> {
+                        valueOnly.roundToInt().toString()
+                    }
+                    LoanParameter.INTEREST_RATE -> {
+                        ("%.2f".format(valueOnly))
+                    }
+                    LoanParameter.LOAN_TERMS -> {
+                        valueOnly.roundToInt().toString()
+                    }
+                    LoanParameter.MONTHLY_PAYMENT -> {
+                        valueOnly.roundToInt().toString()
+                    }
+                }
+
+            } else null
+        return rounded
     }
 
     fun termInMonths(termsUnit: String, value: Double?): Double? {
@@ -229,25 +247,5 @@ class MainActivity : AppCompatActivity() {
             }
         return value
     }
-
-//    fun numbersFormatting(value: Double?) {
-//        when (selectedParameter) {
-//            loanAmount -> {
-//                "%.0f".format(value)
-//            }
-//            downPayment -> {
-//                "%.0f".format(value)
-//            }
-//            interestRate -> {
-//                "%.2f".format(value)
-//            }
-//            loanTerms -> {
-//                "%.0f".format(value)
-//            }
-//            monthlyPayment -> {
-//                "%.2f".format(value)
-//            }
-//        }
-//    }
 }
 

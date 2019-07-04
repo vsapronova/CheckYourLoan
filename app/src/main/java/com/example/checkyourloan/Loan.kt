@@ -68,19 +68,20 @@ class Loan (
         return downPayment
     }
 
-    fun calcMonthlyPayment(): Unit {
+    fun calcMonthlyPayment() {
         monthlyPayment =
             if (loanAmount != null && downPayment != null && interestRate != null && loanTermsMonths != null) {
-                calculateMonthlyPayment(
-                    loanAmount!!,
-                    downPayment!!,
-                    interestRate!!,
-                    loanTermsMonths!!
-                )
+                val value =
+                    calculateMonthlyPayment(
+                        loanAmount!!,
+                        downPayment!!,
+                        interestRate!!,
+                        loanTermsMonths!!
+                    )
+                checkValue(value)
             } else {
                 null
             }
-
     }
 
     fun calcParameter(parameter: MainActivity.LoanParameter): Double? {
@@ -114,4 +115,8 @@ class Loan (
         return value
     }
 
+}
+
+fun checkValue (value: Double): Double? {
+    return if (value != null && value > 0 && value.isInfinite() == false) value else null
 }

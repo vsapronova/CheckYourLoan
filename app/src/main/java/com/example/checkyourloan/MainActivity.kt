@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.View
 import android.widget.*
 import java.lang.Exception
+import java.lang.RuntimeException
 import kotlin.math.roundToInt
 
 
@@ -166,13 +167,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    enum class LoanParameter(val value: Int) {
-        LOAN_AMOUNT(0),
-        DOWN_PAYMENT(1),
-        INTEREST_RATE(2),
-        LOAN_TERMS(3),
-        MONTHLY_PAYMENT(4),
-    }
+
+
 
     fun getDouble(edit: EditText): Double? {
         if (edit.text.length > 0) {
@@ -191,18 +187,34 @@ class MainActivity : AppCompatActivity() {
         val loanTerms = getDouble(editLoanTerms)
         val monthlyPayment = getDouble(editMonthlyPayment)
 
+        val edit = edits[selectedParameter.value]
+
         val selectedTermsUnit = spinner.selectedItem.toString()
 
         val months = termInMonths(selectedTermsUnit, loanTerms)
 
         val loan = Loan(loanAmount, downPayment, interestRate, months, monthlyPayment)
 
+        for (field in edits) {
+            edit.setError(null)
+        }
 
-        val value = loan.calcParameter(selectedParameter)
+        try {
+            val value = loan.calcParameter(selectedParameter)
+            val strValue = formatValue(value)
+            edit.setText(strValue)
 
-        val strValue = formatValue(value)
-        val edit = edits[selectedParameter.value]
-        edit.setText(strValue)
+        }
+        catch (ex: CalcException) {
+            val errors = ex.errors
+            for (error in errors) {
+                edits[error.field.value].setError(error.message)
+
+            }
+            edit.setText("")
+            // show error
+        }
+
     }
 
     fun formatValue(valueOnly: Double?): String? {

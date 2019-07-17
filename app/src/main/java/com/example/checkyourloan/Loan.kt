@@ -1,99 +1,179 @@
 package com.example.checkyourloan
 
-import kotlinx.android.synthetic.main.activity_main.view.*
 
 class Loan (
     var loanAmount: Double?,
     var downPayment: Double?,
     var interestRate: Double?,
-    var loanTermsMonths: Double?,
+    var loanTerms: Double?,
     var monthlyPayment: Double?
 ) {
 
-    fun calcInterestRate() {
-        if (loanAmount != null && downPayment != null && loanTermsMonths != null && monthlyPayment != null) {
-            interestRate = calculateInterestRate(
-                loanAmount!!,
-                downPayment!!,
-                loanTermsMonths!!,
-                monthlyPayment!!
-            )
-        } else {
-            interestRate = null
+    inner class Checker {
+        var errors = listOf<FieldError>()
 
-            var errors = listOf<FieldError>()
+        private fun emptyField(param: LoanParameter): FieldError {
+            return FieldError(param, message = "Field can not be empty")
+        }
+
+        fun loanAmountNotNull() {
             if (loanAmount == null) {
-                errors += (FieldError(LoanParameter.LOAN_AMOUNT, message = "Field can not be empty"))
+                errors += emptyField(LoanParameter.LOAN_AMOUNT)
             }
+        }
+
+
+        fun downPaymentNotNull() {
             if (downPayment == null) {
-                errors += (FieldError(LoanParameter.DOWN_PAYMENT, message = "Field can not be empty"))
+                errors += emptyField(LoanParameter.DOWN_PAYMENT)
             }
-            if (loanTermsMonths == null) {
-                errors += (FieldError(LoanParameter.LOAN_TERMS, message = "Field can not be empty"))
+        }
+
+        fun interestRateNotNull() {
+            if (interestRate == null) {
+                errors += emptyField(LoanParameter.INTEREST_RATE)
             }
+        }
+
+        fun loanTermsNotNull() {
+            if (loanTerms == null) {
+                errors += emptyField(LoanParameter.LOAN_TERMS)
+            }
+        }
+
+        fun monthlyPaymentNotNull() {
             if (monthlyPayment == null) {
-                errors += (FieldError(LoanParameter.MONTHLY_PAYMENT, message = "Field can not be empty"))
+                errors += emptyField(LoanParameter.MONTHLY_PAYMENT)
             }
-            throw CalcException(errors = errors)
+        }
+
+        val hasErrors: Boolean
+            get() = !errors.isEmpty()
+
+        fun throwCalcException() {
+            throw CalcException(errors)
         }
     }
 
-    fun calcLoanTerms() {
-        loanTermsMonths =
-            if (downPayment != null && interestRate != null && loanAmount != null && monthlyPayment != null) {
-                calculateLoanTerm(
-                    loanAmount!!,
-                    downPayment!!,
-                    interestRate!!,
-                    monthlyPayment!!
-                )
-            } else {
-                null
-            }
-    }
-
     fun calcLoanAmount() {
-        loanAmount =
-            if (downPayment != null && interestRate != null && loanTermsMonths != null && monthlyPayment != null) {
-                calculateLoanAmount(
-                    downPayment!!,
-                    interestRate!!,
-                    loanTermsMonths!!,
-                    monthlyPayment!!
-                )
-            } else {
-                null
-            }
+        val checker = Checker()
+
+        checker.interestRateNotNull()
+        checker.downPaymentNotNull()
+        checker.loanTermsNotNull()
+        checker.monthlyPaymentNotNull()
+
+        if (checker.hasErrors) {
+            loanAmount = null
+            checker.throwCalcException()
+        }
+
+        val value =
+            calculateLoanAmount(
+                downPayment!!,
+                interestRate!!,
+                loanTerms!!,
+                monthlyPayment!!
+            )
+        checkValue(value)
+        loanAmount = value
     }
 
     fun calcDownPayment() {
-        downPayment =
-            if (loanAmount != null && interestRate != null && loanTermsMonths != null && monthlyPayment != null) {
-                calculateDownPayment(
-                    loanAmount!!,
-                    interestRate!!,
-                    loanTermsMonths!!,
-                    monthlyPayment!!
-                )
-            } else {
-                null
-            }
+        val checker = Checker()
+
+        checker.loanAmountNotNull()
+        checker.interestRateNotNull()
+        checker.loanTermsNotNull()
+        checker.monthlyPaymentNotNull()
+
+        if (checker.hasErrors) {
+            downPayment = null
+            checker.throwCalcException()
+        }
+
+        val value =
+            calculateDownPayment(
+                loanAmount!!,
+                interestRate!!,
+                loanTerms!!,
+                monthlyPayment!!
+            )
+        checkValue(value)
+        downPayment = value
+    }
+
+    fun calcInterestRate() {
+        val checker = Checker()
+
+        checker.loanAmountNotNull()
+        checker.downPaymentNotNull()
+        checker.loanTermsNotNull()
+        checker.monthlyPaymentNotNull()
+
+        if (checker.hasErrors) {
+            interestRate = null
+            checker.throwCalcException()
+        }
+
+        val value =
+            calculateInterestRate(
+                loanAmount!!,
+                downPayment!!,
+                loanTerms!!,
+                monthlyPayment!!
+            )
+        checkValue(value)
+        interestRate = value
+    }
+
+    fun calcLoanTerms() {
+        val checker = Checker()
+
+        checker.loanAmountNotNull()
+        checker.downPaymentNotNull()
+        checker.interestRateNotNull()
+        checker.monthlyPaymentNotNull()
+
+        if (checker.hasErrors) {
+            loanTerms = null
+            checker.throwCalcException()
+        }
+
+        val value =
+            calculateLoanTerm(
+                loanAmount!!,
+                downPayment!!,
+                interestRate!!,
+                monthlyPayment!!
+            )
+        checkValue(value)
+        loanTerms = value
     }
 
     fun calcMonthlyPayment() {
-        monthlyPayment =
-            if (loanAmount != null && downPayment != null && interestRate != null && loanTermsMonths != null) {
-                val value =
-                    calculateMonthlyPayment(
-                        loanAmount!!,
-                        downPayment!!,
-                        interestRate!!,
-                        loanTermsMonths!!
-                    )
-                checkValue(value)
-            } else {
-                null
-            }
+        val checker = Checker()
+
+        checker.loanAmountNotNull()
+        checker.downPaymentNotNull()
+        checker.interestRateNotNull()
+        checker.loanTermsNotNull()
+
+        if (checker.hasErrors) {
+            monthlyPayment = null
+            checker.throwCalcException()
+        }
+
+        val value =
+            calculateMonthlyPayment(
+                loanAmount!!,
+                downPayment!!,
+                interestRate!!,
+                loanTerms!!
+
+            )
+        checkValue(value)
+        monthlyPayment = value
     }
 
     fun calcParameter(parameter: LoanParameter): Double? {
@@ -115,7 +195,7 @@ class Loan (
                 }
                 LoanParameter.LOAN_TERMS -> {
                     calcLoanTerms()
-                    loanTermsMonths
+                    loanTerms
 
                 }
                 LoanParameter.INTEREST_RATE -> {
@@ -139,7 +219,7 @@ enum class LoanParameter(val value: Int) {
 
 
 fun checkValue (value: Double): Double? {
-    return if (value != null && value > 0 && value.isInfinite() == false) value else null
+    return if (value > 0 && value.isInfinite() == false) value else null
 }
 
 class FieldError(var field: LoanParameter, var message: String)

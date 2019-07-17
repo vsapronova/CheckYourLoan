@@ -167,9 +167,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-
-
     fun getDouble(edit: EditText): Double? {
         if (edit.text.length > 0) {
             val strValue = edit.text.toString()

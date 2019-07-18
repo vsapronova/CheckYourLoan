@@ -22,10 +22,45 @@ class Loan (
             }
         }
 
+        fun calculatedLoanAmountPositive(value: Double) {
+            if (value < 0) {
+                errors += FieldError(LoanParameter.MONTHLY_PAYMENT, "Increase Monthly Payment")
+            }
+        }
+
+        fun calculatedLoanAmountNaN(value: Double) {
+            if (value.isNaN()) {
+                errors += FieldError(LoanParameter.DOWN_PAYMENT, "Increase Down Payment")
+            }
+        }
+
+        fun calculatedLoanAmountInfinite(value: Double) {
+            if (value.isInfinite()) {
+                errors += FieldError(LoanParameter.MONTHLY_PAYMENT, "Increase Monthly Payment")
+            }
+        }
 
         fun downPaymentNotNull() {
             if (downPayment == null) {
                 errors += emptyField(LoanParameter.DOWN_PAYMENT)
+            }
+        }
+
+        fun calculatedDownPaymentPositive(value: Double) {
+            if (value < 0) {
+                errors += FieldError(LoanParameter.LOAN_AMOUNT, "Increase Total Amount")
+            }
+        }
+
+        fun calculatedDownPaymentNaN (value: Double) {
+            if (value.isNaN()) {
+                errors += FieldError(LoanParameter.MONTHLY_PAYMENT, "Increase Monthly Payment")
+            }
+        }
+
+        fun calculatedDownPaymentInfinite (value: Double) {
+            if (value.isInfinite()) {
+                errors += FieldError(LoanParameter.MONTHLY_PAYMENT, "Increase Monthly Payment")
             }
         }
 
@@ -35,15 +70,57 @@ class Loan (
             }
         }
 
+        fun calculatedInterestRatePositive(value: Double) {
+            if (value < 0) {
+                errors += FieldError(LoanParameter.MONTHLY_PAYMENT, message = "Increase Monthly Payment")
+            }
+        }
+
         fun loanTermsNotNull() {
             if (loanTerms == null) {
                 errors += emptyField(LoanParameter.LOAN_TERMS)
             }
         }
 
+        fun calculatedLoanTermsPositive(value: Double) {
+            if (value < 0) {
+                errors += FieldError(LoanParameter.LOAN_AMOUNT, "Increase Total Amount")
+            }
+        }
+
+        fun calculatedLoanTermsNaN(value: Double) {
+            if (value.isNaN()) {
+                errors += FieldError(LoanParameter.MONTHLY_PAYMENT, "Increase Monthly Payment")
+            }
+        }
+
+        fun calculatedLoanTermsInfinite(value: Double) {
+            if (value.isInfinite()) {
+                errors += FieldError(LoanParameter.MONTHLY_PAYMENT, "Increase Monthly Payment")
+            }
+        }
+
         fun monthlyPaymentNotNull() {
             if (monthlyPayment == null) {
                 errors += emptyField(LoanParameter.MONTHLY_PAYMENT)
+            }
+        }
+
+        fun calculatedMonthlyPaymentPositive(value: Double) {
+            if (value < 0) {
+               errors += FieldError(LoanParameter.LOAN_AMOUNT, "Increase Total Amount")
+            }
+        }
+
+        fun calculatedMonthlyPaymentNaN(value: Double) {
+            if (value.isNaN()) {
+                FieldError(LoanParameter.LOAN_AMOUNT, "Change Total Amount")
+            }
+        }
+
+        fun calculatedMonthlyPaymentInfinite(value: Double) {
+            if (value.isInfinite()) {
+                FieldError(LoanParameter.LOAN_TERMS, "Decrease Loan Terms")
             }
         }
 
@@ -75,7 +152,15 @@ class Loan (
                 loanTerms!!,
                 monthlyPayment!!
             )
-        checkValue(value)
+
+        checker.calculatedLoanAmountPositive(value)
+        checker.calculatedLoanAmountNaN(value)
+        checker.calculatedLoanAmountInfinite(value)
+
+        if (checker.hasErrors) {
+            checker.throwCalcException()
+        }
+
         loanAmount = value
     }
 
@@ -99,7 +184,15 @@ class Loan (
                 loanTerms!!,
                 monthlyPayment!!
             )
-        checkValue(value)
+
+        checker.calculatedDownPaymentPositive(value)
+        checker.calculatedDownPaymentNaN(value)
+        checker.calculatedDownPaymentInfinite(value)
+
+        if (checker.hasErrors) {
+            checker.throwCalcException()
+        }
+
         downPayment = value
     }
 
@@ -123,7 +216,13 @@ class Loan (
                 loanTerms!!,
                 monthlyPayment!!
             )
-        checkValue(value)
+
+        checker.calculatedInterestRatePositive(value)
+
+        if (checker.hasErrors) {
+            checker.throwCalcException()
+        }
+
         interestRate = value
     }
 
@@ -147,7 +246,15 @@ class Loan (
                 interestRate!!,
                 monthlyPayment!!
             )
-        checkValue(value)
+
+        checker.calculatedLoanTermsPositive(value)
+        checker.calculatedLoanTermsNaN(value)
+        checker.calculatedLoanTermsInfinite(value)
+
+        if (checker.hasErrors) {
+            checker.throwCalcException()
+        }
+
         loanTerms = value
     }
 
@@ -170,9 +277,16 @@ class Loan (
                 downPayment!!,
                 interestRate!!,
                 loanTerms!!
-
             )
-        checkValue(value)
+
+        checker.calculatedMonthlyPaymentPositive(value)
+        checker.calculatedMonthlyPaymentNaN(value)
+        checker.calculatedMonthlyPaymentInfinite(value)
+
+        if (checker.hasErrors) {
+            checker.throwCalcException()
+        }
+
         monthlyPayment = value
     }
 
@@ -217,10 +331,6 @@ enum class LoanParameter(val value: Int) {
     MONTHLY_PAYMENT(4),
 }
 
-
-fun checkValue (value: Double): Double? {
-    return if (value > 0 && value.isInfinite() == false) value else null
-}
 
 class FieldError(var field: LoanParameter, var message: String)
 

@@ -206,7 +206,6 @@ class MainActivity : AppCompatActivity() {
             val errors = ex.errors
             for (error in errors) {
                 edits[error.field.value].setError(error.message)
-
             }
             edit.setText("")
             // show error

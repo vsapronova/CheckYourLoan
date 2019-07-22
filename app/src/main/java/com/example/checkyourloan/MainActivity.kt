@@ -186,7 +186,7 @@ class MainActivity : AppCompatActivity() {
 
         val edit = edits[selectedParameter.value]
 
-        val selectedTermsUnit = spinner.selectedItem.toString()
+        val selectedTermsUnit = Terms.values().find { it.value == spinner.selectedItemPosition }!!
 
         val months = termInMonths(selectedTermsUnit, loanTerms)
 
@@ -211,6 +211,11 @@ class MainActivity : AppCompatActivity() {
             // show error
         }
 
+    }
+
+    enum class Terms (val value: Int) {
+        MONTHS (0),
+        YEARS (1)
     }
 
     fun formatValue(valueOnly: Double?): String? {
@@ -238,22 +243,36 @@ class MainActivity : AppCompatActivity() {
         return rounded
     }
 
-    fun termInMonths(termsUnit: String, value: Double?): Double? {
+    fun termInMonths(termsUnit: Terms, value: Double?): Double? {
         if (value == null) return null
         val value =
             when(termsUnit) {
-                "months" -> {
+                Terms.MONTHS -> {
                     value
                 }
-                "years" -> {
+                Terms.YEARS -> {
                     value * 12
-                }
-
-                else -> {
-                    throw Exception("")
                 }
             }
         return value
     }
+
+    fun convertLoanTermsMonthsYears (selectedTermsUnit: Terms, value: Double) {
+        val value =
+            when (selectedTermsUnit) {
+                Terms.MONTHS -> {
+                    value
+                }
+                Terms.YEARS -> {
+                    value / 12
+                }
+                else -> {
+                    throw Exception("")
+                }
+            }
+    }
 }
+
+
+
 

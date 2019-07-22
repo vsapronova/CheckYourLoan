@@ -1,5 +1,7 @@
 package com.example.checkyourloan
 
+import android.widget.Spinner
+
 
 class Loan (
     var loanAmount: Double?,
@@ -330,6 +332,7 @@ enum class LoanParameter(val value: Int) {
     LOAN_TERMS(3),
     MONTHLY_PAYMENT(4),
 }
+
 
 
 class FieldError(var field: LoanParameter, var message: String)

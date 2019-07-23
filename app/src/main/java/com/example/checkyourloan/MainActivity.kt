@@ -10,8 +10,6 @@ import android.text.style.ImageSpan
 import android.view.Menu
 import android.view.View
 import android.widget.*
-import java.lang.Exception
-import java.lang.RuntimeException
 import kotlin.math.roundToInt
 
 
@@ -167,34 +165,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun getDouble(edit: EditText): Double? {
-        if (edit.text.length > 0) {
-            val strValue = edit.text.toString()
-            val cleanStrValue = strValue.replace(",", "")
-            return cleanStrValue.toDouble()
-        } else {
-            return null
-        }
-    }
 
     fun calculateListener() {
-        val loanAmount = getDouble(editLoanAmount)
+        val amount = getDouble(editLoanAmount)
         val downPayment = getDouble(editDownPayment)
         val interestRate = getDouble(editInterestRate)
-        val loanTerms = getDouble(editLoanTerms)
+        val terms = getDouble(editLoanTerms)
         val monthlyPayment = getDouble(editMonthlyPayment)
+        val selectedTermsUnit = TermsUnit.values().find { it.value == spinner.selectedItemPosition }!!
 
-        val edit = edits[selectedParameter.value]
+        val loan = Loan(amount, downPayment, interestRate, monthlyPayment, terms, selectedTermsUnit)
 
-        val selectedTermsUnit = Terms.values().find { it.value == spinner.selectedItemPosition }!!
-
-        val months = termInMonths(selectedTermsUnit, loanTerms)
-
-        val loan = Loan(loanAmount, downPayment, interestRate, months, monthlyPayment)
-
-        for (field in edits) {
+        for (edit in edits) {
             edit.setError(null)
         }
+
+        val edit = edits[selectedParameter.value]
 
         try {
             val value = loan.calcParameter(selectedParameter)
@@ -213,10 +199,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    enum class Terms (val value: Int) {
-        MONTHS (0),
-        YEARS (1)
-    }
 
     fun formatValue(valueOnly: Double?): String? {
         val rounded =
@@ -241,35 +223,6 @@ class MainActivity : AppCompatActivity() {
 
             } else null
         return rounded
-    }
-
-    fun termInMonths(termsUnit: Terms, value: Double?): Double? {
-        if (value == null) return null
-        val value =
-            when(termsUnit) {
-                Terms.MONTHS -> {
-                    value
-                }
-                Terms.YEARS -> {
-                    value * 12
-                }
-            }
-        return value
-    }
-
-    fun convertLoanTermsMonthsYears (selectedTermsUnit: Terms, value: Double) {
-        val value =
-            when (selectedTermsUnit) {
-                Terms.MONTHS -> {
-                    value
-                }
-                Terms.YEARS -> {
-                    value / 12
-                }
-                else -> {
-                    throw Exception("")
-                }
-            }
     }
 }
 

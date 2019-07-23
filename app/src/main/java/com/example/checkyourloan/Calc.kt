@@ -81,3 +81,30 @@ fun calculateInterestRate(loanAmount: Double, downPayment: Double, loanTerms: Do
 
     return r0
 }
+
+fun calculateTermsInMonths(termsUnitUnit: TermsUnit, value: Double?): Double? {
+    if (value == null) return null
+    val value =
+        when(termsUnitUnit) {
+            TermsUnit.MONTHS -> {
+                value
+            }
+            TermsUnit.YEARS -> {
+                value * 12
+            }
+        }
+    return value
+}
+
+fun convertLoanTermsMonthsYears (selectedTermsUnit: TermsUnit, value: Double): Double {
+    val value =
+        when (selectedTermsUnit) {
+            TermsUnit.MONTHS -> {
+                value
+            }
+            TermsUnit.YEARS -> {
+                value / 12
+            }
+        }
+    return value
+}

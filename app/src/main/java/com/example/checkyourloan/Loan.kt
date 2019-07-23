@@ -1,15 +1,17 @@
 package com.example.checkyourloan
 
-import android.widget.Spinner
+import android.widget.EditText
 
-
-class Loan (
-    var loanAmount: Double?,
+class Loan(
+    var amount: Double?,
     var downPayment: Double?,
     var interestRate: Double?,
-    var loanTerms: Double?,
-    var monthlyPayment: Double?
+    var monthlyPayment: Double?,
+    var terms: Double?,
+    var termsUnit: TermsUnit
 ) {
+    val termsInMonths: Double?
+        get() = calculateTermsInMonths(termsUnit, terms)
 
     inner class Checker {
         var errors = listOf<FieldError>()
@@ -19,7 +21,7 @@ class Loan (
         }
 
         fun loanAmountNotNull() {
-            if (loanAmount == null) {
+            if (amount == null) {
                 errors += emptyField(LoanParameter.LOAN_AMOUNT)
             }
         }
@@ -79,7 +81,7 @@ class Loan (
         }
 
         fun loanTermsNotNull() {
-            if (loanTerms == null) {
+            if (terms == null) {
                 errors += emptyField(LoanParameter.LOAN_TERMS)
             }
         }
@@ -122,7 +124,7 @@ class Loan (
 
         fun calculatedMonthlyPaymentInfinite(value: Double) {
             if (value.isInfinite()) {
-                FieldError(LoanParameter.LOAN_TERMS, "Decrease Loan Terms")
+                FieldError(LoanParameter.LOAN_TERMS, "Decrease Loan TermsUnit")
             }
         }
 
@@ -143,7 +145,7 @@ class Loan (
         checker.monthlyPaymentNotNull()
 
         if (checker.hasErrors) {
-            loanAmount = null
+            amount = null
             checker.throwCalcException()
         }
 
@@ -151,7 +153,7 @@ class Loan (
             calculateLoanAmount(
                 downPayment!!,
                 interestRate!!,
-                loanTerms!!,
+                termsInMonths!!,
                 monthlyPayment!!
             )
 
@@ -163,7 +165,7 @@ class Loan (
             checker.throwCalcException()
         }
 
-        loanAmount = value
+        amount = value
     }
 
     fun calcDownPayment() {
@@ -181,9 +183,9 @@ class Loan (
 
         val value =
             calculateDownPayment(
-                loanAmount!!,
+                amount!!,
                 interestRate!!,
-                loanTerms!!,
+                termsInMonths!!,
                 monthlyPayment!!
             )
 
@@ -213,9 +215,9 @@ class Loan (
 
         val value =
             calculateInterestRate(
-                loanAmount!!,
+                amount!!,
                 downPayment!!,
-                loanTerms!!,
+                termsInMonths!!,
                 monthlyPayment!!
             )
 
@@ -237,13 +239,13 @@ class Loan (
         checker.monthlyPaymentNotNull()
 
         if (checker.hasErrors) {
-            loanTerms = null
+            terms = null
             checker.throwCalcException()
         }
 
         val value =
             calculateLoanTerm(
-                loanAmount!!,
+                amount!!,
                 downPayment!!,
                 interestRate!!,
                 monthlyPayment!!
@@ -257,7 +259,8 @@ class Loan (
             checker.throwCalcException()
         }
 
-        loanTerms = value
+        terms = convertLoanTermsMonthsYears(termsUnit, value)
+
     }
 
     fun calcMonthlyPayment() {
@@ -275,10 +278,10 @@ class Loan (
 
         val value =
             calculateMonthlyPayment(
-                loanAmount!!,
+                amount!!,
                 downPayment!!,
                 interestRate!!,
-                loanTerms!!
+                termsInMonths!!
             )
 
         checker.calculatedMonthlyPaymentPositive(value)
@@ -306,12 +309,12 @@ class Loan (
                 }
                 LoanParameter.LOAN_AMOUNT -> {
                     calcLoanAmount()
-                    loanAmount
+                    amount
 
                 }
                 LoanParameter.LOAN_TERMS -> {
                     calcLoanTerms()
-                    loanTerms
+                    terms
 
                 }
                 LoanParameter.INTEREST_RATE -> {
@@ -322,8 +325,11 @@ class Loan (
             }
         return value
     }
-
 }
+
+
+
+
 
 enum class LoanParameter(val value: Int) {
     LOAN_AMOUNT(0),
@@ -332,6 +338,23 @@ enum class LoanParameter(val value: Int) {
     LOAN_TERMS(3),
     MONTHLY_PAYMENT(4),
 }
+
+enum class TermsUnit (val value: Int) {
+    MONTHS (0),
+    YEARS (1)
+}
+
+fun getDouble(edit: EditText): Double? {
+    if (edit.text.length > 0) {
+        val strValue = edit.text.toString()
+        val cleanStrValue = strValue.replace(",", "")
+        return cleanStrValue.toDouble()
+    } else {
+        return null
+    }
+}
+
+
 
 
 

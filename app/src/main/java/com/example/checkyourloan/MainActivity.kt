@@ -1,5 +1,7 @@
 package com.example.checkyourloan
 
+import android.graphics.Color
+import android.graphics.Typeface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -36,9 +38,13 @@ class MainActivity : AppCompatActivity() {
 
 
         editLoanAmount = findViewById(R.id.editLoanAmount)
+        editLoanAmount.setText("300,000")
         editDownPayment = findViewById(R.id.editDownPayment)
+        editDownPayment.setText("60,000")
         editInterestRate = findViewById(R.id.editInterestRate)
+        editInterestRate.setText("3.50")
         editLoanTerms = findViewById(R.id.editLoanTerms)
+        editLoanTerms.setText("360")
         editMonthlyPayment = findViewById(R.id.editMonthlyPayment)
         toggleLoanAmount = findViewById(R.id.toggleLoanAmount)
         toggleDownPayment = findViewById(R.id.toggleDownPayment)
@@ -135,6 +141,9 @@ class MainActivity : AppCompatActivity() {
         LoanParameter.values().forEach {
             setParameterState(it, calc = selectedParameter == it)
         }
+        edits[selectedParameter.value].setTypeface(null, Typeface.BOLD)
+        edits[selectedParameter.value].setTextColor(Color.BLACK)
+
 
         calculateListener()
     }
@@ -143,6 +152,8 @@ class MainActivity : AppCompatActivity() {
         if (isChecked) {
             val index = buttons.indexOf(checkedButton)
             val parameter = LoanParameter.values().find { it.value == index }!!
+            edits[selectedParameter.value].setTypeface(null, Typeface.NORMAL)
+            edits[selectedParameter.value].setTextColor(Color.BLACK)
             selectParameter(parameter)
         }
     }
@@ -174,7 +185,10 @@ class MainActivity : AppCompatActivity() {
         val monthlyPayment = getDouble(editMonthlyPayment)
         val selectedTermsUnit = TermsUnit.values().find { it.value == spinner.selectedItemPosition }!!
 
+
         val loan = Loan(amount, downPayment, interestRate, monthlyPayment, terms, selectedTermsUnit)
+
+
 
         for (edit in edits) {
             edit.setError(null)
@@ -186,7 +200,6 @@ class MainActivity : AppCompatActivity() {
             val value = loan.calcParameter(selectedParameter)
             val strValue = formatValue(value)
             edit.setText(strValue)
-
         }
         catch (ex: CalcException) {
             val errors = ex.errors

@@ -4,14 +4,12 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.text.Spanned
-import android.text.SpannableString
+import android.text.*
 import android.text.style.ImageSpan
 import android.view.Menu
 import android.view.View
 import android.widget.*
+import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 
@@ -54,6 +52,8 @@ class MainActivity : AppCompatActivity() {
         spinner = findViewById(R.id.spinnerTerms)
 
 
+
+
         buttons =
             arrayListOf(toggleLoanAmount, toggleDownPayment, toggleInterestRate, toggleLoanTerms, toggleMonthlyPayment)
         edits = arrayListOf(editLoanAmount, editDownPayment, editInterestRate, editLoanTerms, editMonthlyPayment)
@@ -91,7 +91,8 @@ class MainActivity : AppCompatActivity() {
         editDownPayment.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editDownPayment) }))
         editMonthlyPayment.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editMonthlyPayment) }))
 
-
+        editInterestRate.setFilters(arrayOf<InputFilter>(DecimalDigitsInputFilter(5, 2)))
+        
         editInterestRate.addTextChangedListener(EditWatcher(editInterestRate))
         editLoanTerms.addTextChangedListener(EditWatcher(editLoanTerms))
 
@@ -112,7 +113,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -237,6 +237,24 @@ class MainActivity : AppCompatActivity() {
             } else null
         return rounded
     }
+
+    class DecimalDigitsInputFilter(digitsBeforeZero: Int, digitsAfterZero: Int) : InputFilter {
+
+        internal var mPattern: Pattern
+
+        init {
+            mPattern =
+                Pattern.compile("[0-9]{0," + (digitsBeforeZero - 1) + "}+((\\.[0-9]{0," + (digitsAfterZero - 1) + "})?)||(\\.)?")
+        }
+
+        override fun filter(source: CharSequence, start: Int, end: Int, dest: Spanned, dstart: Int, dend: Int): CharSequence? {
+
+            val matcher = mPattern.matcher(dest)
+            return if (!matcher.matches()) "" else null
+        }
+
+    }
+
 }
 
 

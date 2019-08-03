@@ -106,6 +106,7 @@ class MainActivity : AppCompatActivity() {
 
         spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                // set selected terms unit to loan
                 calculateListener()
             }
 
@@ -160,6 +161,7 @@ class MainActivity : AppCompatActivity() {
 
     fun editTextChanged(edit: EditText) {
         if (edit != edits[selectedParameter.value]) {
+            // set value from edit into loan
             calculateListener()
         }
     }
@@ -170,9 +172,7 @@ class MainActivity : AppCompatActivity() {
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
         override fun afterTextChanged(s: Editable) {
-            if (edit != edits[selectedParameter.value]) {
-                calculateListener()
-            }
+            editTextChanged(edit)
         }
     }
 
@@ -186,7 +186,7 @@ class MainActivity : AppCompatActivity() {
         val selectedTermsUnit = TermsUnit.values().find { it.value == spinner.selectedItemPosition }!!
 
 
-        val loan = Loan(amount, downPayment, interestRate, monthlyPayment, terms, selectedTermsUnit)
+        val loan = Loan(amount, downPayment, interestRate, terms, monthlyPayment, selectedTermsUnit)
 
 
 

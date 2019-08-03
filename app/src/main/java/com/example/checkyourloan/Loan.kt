@@ -6,8 +6,8 @@ class Loan(
     var amount: Double?,
     var downPayment: Double?,
     var interestRate: Double?,
-    var monthlyPayment: Double?,
     var terms: Double?,
+    var monthlyPayment: Double?,
     var termsUnit: TermsUnit
 ) {
     val termsInMonths: Double?

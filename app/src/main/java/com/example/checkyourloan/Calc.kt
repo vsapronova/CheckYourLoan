@@ -64,8 +64,14 @@ fun calculateInterestRate(loanAmount: Double, downPayment: Double, loanTerms: Do
             r0 = r1
             r1 += step
         }
+        else if (monthlyr1 == monthlyPayment) {
+            return r1
+        }
+
         monthlyr0 = monthly(r0)
         monthlyr1 = monthly(r1)
+
+
     }
 
     while ( abs(monthlyPayment-monthlyr0) > 0.0001) {

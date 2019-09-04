@@ -8,9 +8,8 @@ import kotlin.test.assertFailsWith
 class PositiveResultTest {
 
     @Test
-    fun totalAmountNegative() {
-//        val checker = Loan().Checker()
-//        val result = calculateLoanAmount(5000.0, 0.0, 2.0, 3000.0)
-//        assertFailsWith(checker.calculatedLoanAmountPositive(result))
+    fun loanTermsNan() {
+//        val loan = Loan(200000.0, 2000.0, 10.0, 1600.0, termsUnit = TermsUnit.MONTHS)
+//        assertFailsWith<CalcException>(loan.calcLoatTerms)
     }
 }

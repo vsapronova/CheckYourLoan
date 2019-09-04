@@ -74,6 +74,14 @@ class Loan(
             }
         }
 
+        fun loanAmountBiggerDownPayment() {
+            errors += FieldError(LoanParameter.LOAN_AMOUNT, "Increase Total Amount")
+        }
+
+        fun loanAmountEqualDownPayment() {
+            errors += FieldError(LoanParameter.LOAN_AMOUNT, "Increase Total Amount")
+        }
+
         fun calculatedInterestRatePositive(value: Double) {
             if (value < 0) {
                 errors += FieldError(LoanParameter.MONTHLY_PAYMENT, message = "Increase Monthly Payment")
@@ -215,6 +223,13 @@ class Loan(
     fun calcInterestRate() {
         val checker = Checker()
 
+        if (amount != null && downPayment != null && amount!! < downPayment!!) {
+            checker.loanAmountBiggerDownPayment()
+        }
+
+        if (amount != null && downPayment != null && amount!! == downPayment!!) {
+            checker.loanAmountEqualDownPayment()
+        }
         checker.loanAmountNotNull()
         checker.downPaymentNotNull()
         checker.loanTermsNotNull()

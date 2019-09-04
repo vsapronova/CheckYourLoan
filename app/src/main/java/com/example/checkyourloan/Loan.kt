@@ -80,6 +80,18 @@ class Loan(
             }
         }
 
+        fun calculatedInterestRateNaN(value: Double) {
+            if (value.isNaN()) {
+                errors += FieldError(LoanParameter.LOAN_AMOUNT, message = "Increase Total Amount")
+            }
+        }
+
+        fun calculatedInterestRateInfinite(value: Double) {
+            if (value.isInfinite()) {
+                errors += FieldError(LoanParameter.LOAN_AMOUNT, message = "Increase Total Amount")
+            }
+        }
+
         fun loanTermsNotNull() {
             if (terms == null) {
                 errors += emptyField(LoanParameter.LOAN_TERMS)
@@ -118,13 +130,13 @@ class Loan(
 
         fun calculatedMonthlyPaymentNaN(value: Double) {
             if (value.isNaN()) {
-                FieldError(LoanParameter.LOAN_AMOUNT, "Change Total Amount")
+                errors += FieldError(LoanParameter.LOAN_AMOUNT, "Change Total Amount")
             }
         }
 
         fun calculatedMonthlyPaymentInfinite(value: Double) {
             if (value.isInfinite()) {
-                FieldError(LoanParameter.LOAN_TERMS, "Decrease Loan TermsUnit")
+                errors += FieldError(LoanParameter.LOAN_TERMS, "Decrease Loan Terms")
             }
         }
 
@@ -222,6 +234,8 @@ class Loan(
             )
 
         checker.calculatedInterestRatePositive(value)
+        checker.calculatedInterestRateNaN(value)
+        checker.calculatedInterestRateInfinite(value)
 
         if (checker.hasErrors) {
             checker.throwCalcException()

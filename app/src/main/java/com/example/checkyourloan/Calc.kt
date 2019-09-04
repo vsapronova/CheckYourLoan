@@ -82,10 +82,10 @@ fun calculateInterestRate(loanAmount: Double, downPayment: Double, loanTerms: Do
     return r0
 }
 
-fun calculateTermsInMonths(termsUnitUnit: TermsUnit, value: Double?): Double? {
+fun calculateTermsInMonths(termsUnit: TermsUnit, value: Double?): Double? {
     if (value == null) return null
     val value =
-        when(termsUnitUnit) {
+        when(termsUnit) {
             TermsUnit.MONTHS -> {
                 value
             }

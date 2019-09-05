@@ -22,7 +22,7 @@ class Loan(
 
         fun loanAmountNotNull() {
             if (amount == null) {
-                errors += emptyField(LoanParameter.LOAN_AMOUNT)
+                errors += emptyField(LoanParameter.TOTAL_AMOUNT)
             }
         }
 
@@ -52,7 +52,7 @@ class Loan(
 
         fun calculatedDownPaymentPositive(value: Double) {
             if (value < 0) {
-                errors += FieldError(LoanParameter.LOAN_AMOUNT, "Increase Total Amount")
+                errors += FieldError(LoanParameter.TOTAL_AMOUNT, "Increase Total Amount")
             }
         }
 
@@ -75,11 +75,11 @@ class Loan(
         }
 
         fun loanAmountBiggerDownPayment() {
-            errors += FieldError(LoanParameter.LOAN_AMOUNT, "Increase Total Amount")
+            errors += FieldError(LoanParameter.TOTAL_AMOUNT, "Increase Total Amount")
         }
 
         fun loanAmountEqualDownPayment() {
-            errors += FieldError(LoanParameter.LOAN_AMOUNT, "Increase Total Amount")
+            errors += FieldError(LoanParameter.TOTAL_AMOUNT, "Increase Total Amount")
         }
 
         fun calculatedInterestRatePositive(value: Double) {
@@ -90,25 +90,25 @@ class Loan(
 
         fun calculatedInterestRateNaN(value: Double) {
             if (value.isNaN()) {
-                errors += FieldError(LoanParameter.LOAN_AMOUNT, message = "Increase Total Amount")
+                errors += FieldError(LoanParameter.TOTAL_AMOUNT, message = "Increase Total Amount")
             }
         }
 
         fun calculatedInterestRateInfinite(value: Double) {
             if (value.isInfinite()) {
-                errors += FieldError(LoanParameter.LOAN_AMOUNT, message = "Increase Total Amount")
+                errors += FieldError(LoanParameter.TOTAL_AMOUNT, message = "Increase Total Amount")
             }
         }
 
         fun loanTermsNotNull() {
             if (terms == null) {
-                errors += emptyField(LoanParameter.LOAN_TERMS)
+                errors += emptyField(LoanParameter.TERMS)
             }
         }
 
         fun calculatedLoanTermsPositive(value: Double) {
             if (value < 0) {
-                errors += FieldError(LoanParameter.LOAN_AMOUNT, "Increase Total Amount")
+                errors += FieldError(LoanParameter.TOTAL_AMOUNT, "Increase Total Amount")
             }
         }
 
@@ -132,19 +132,19 @@ class Loan(
 
         fun calculatedMonthlyPaymentPositive(value: Double) {
             if (value < 0) {
-               errors += FieldError(LoanParameter.LOAN_AMOUNT, "Increase Total Amount")
+               errors += FieldError(LoanParameter.TOTAL_AMOUNT, "Increase Total Amount")
             }
         }
 
         fun calculatedMonthlyPaymentNaN(value: Double) {
             if (value.isNaN()) {
-                errors += FieldError(LoanParameter.LOAN_AMOUNT, "Change Total Amount")
+                errors += FieldError(LoanParameter.TOTAL_AMOUNT, "Change Total Amount")
             }
         }
 
         fun calculatedMonthlyPaymentInfinite(value: Double) {
             if (value.isInfinite()) {
-                errors += FieldError(LoanParameter.LOAN_TERMS, "Decrease Loan Terms")
+                errors += FieldError(LoanParameter.TERMS, "Decrease Loan Terms")
             }
         }
 
@@ -336,12 +336,12 @@ class Loan(
                     downPayment
 
                 }
-                LoanParameter.LOAN_AMOUNT -> {
+                LoanParameter.TOTAL_AMOUNT -> {
                     calcLoanAmount()
                     amount
 
                 }
-                LoanParameter.LOAN_TERMS -> {
+                LoanParameter.TERMS -> {
                     calcLoanTerms()
                     terms
 
@@ -361,10 +361,10 @@ class Loan(
 
 
 enum class LoanParameter(val value: Int) {
-    LOAN_AMOUNT(0),
+    TOTAL_AMOUNT(0),
     DOWN_PAYMENT(1),
     INTEREST_RATE(2),
-    LOAN_TERMS(3),
+    TERMS(3),
     MONTHLY_PAYMENT(4),
 }
 

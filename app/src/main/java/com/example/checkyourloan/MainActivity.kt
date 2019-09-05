@@ -217,7 +217,7 @@ class MainActivity : AppCompatActivity() {
         val rounded =
             if (valueOnly != null) {
                 when (selectedParameter) {
-                    LoanParameter.LOAN_AMOUNT -> {
+                    LoanParameter.TOTAL_AMOUNT -> {
                         valueOnly.roundToInt().toString()
                     }
                     LoanParameter.DOWN_PAYMENT -> {
@@ -226,7 +226,7 @@ class MainActivity : AppCompatActivity() {
                     LoanParameter.INTEREST_RATE -> {
                         ("%.2f".format(valueOnly))
                     }
-                    LoanParameter.LOAN_TERMS -> {
+                    LoanParameter.TERMS -> {
                         valueOnly.roundToInt().toString()
                     }
                     LoanParameter.MONTHLY_PAYMENT -> {

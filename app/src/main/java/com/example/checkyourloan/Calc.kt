@@ -52,29 +52,31 @@ fun calculateInterestRate(loanAmount: Double, downPayment: Double, loanTerms: Do
     var r0 = 0.0
     var r1 = 0.0
 
+
     var monthlyr0 = monthly(r0)
     var monthlyr1 = monthly(r1)
 
-    while ( !(monthlyr0 < monthlyPayment && monthlyr1 > monthlyPayment) ) {
+    var n = 0
+    while (!(monthlyr0 < monthlyPayment && monthlyr1 > monthlyPayment)) {
         if (monthlyr0 > monthlyPayment) {
             r1 = r0
             r0 -= step
-        }
-        else if (monthlyr1 < monthlyPayment) {
+        } else if (monthlyr1 < monthlyPayment) {
             r0 = r1
             r1 += step
-        }
-        else if (monthlyr1 == monthlyPayment) {
+        } else if (monthlyr1 == monthlyPayment) {
             return r1
         }
 
         monthlyr0 = monthly(r0)
         monthlyr1 = monthly(r1)
 
-
+        n += 1
+        if (n >= 10000) return Double.NaN
     }
 
-    while ( abs(monthlyPayment-monthlyr0) > 0.0001) {
+    var m = 0
+    while (abs(monthlyPayment - monthlyr0) > 0.0001) {
         val middle = r0 + (r1 - r0) / 2
         val monthlymid = monthly(middle)
         if (monthlyPayment < monthlymid) {
@@ -83,8 +85,9 @@ fun calculateInterestRate(loanAmount: Double, downPayment: Double, loanTerms: Do
             r0 = middle
         }
         monthlyr0 = monthly(r0)
+        m += 1
+        if (m >= 10000) return Double.NaN
     }
-
     return r0
 }
 

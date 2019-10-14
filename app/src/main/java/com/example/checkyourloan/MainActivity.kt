@@ -30,19 +30,19 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var selectedParameter: LoanParameter
 
+    lateinit var loan: Loan
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        loan = Loan(amount = 300000.0, downPayment = 60000.0, interestRate = 3.50, terms = 360.0, monthlyPayment = null, termsUnit = TermsUnit.MONTHS)
+
 
         editLoanAmount = findViewById(R.id.editLoanAmount)
-        editLoanAmount.setText("300,000")
         editDownPayment = findViewById(R.id.editDownPayment)
-        editDownPayment.setText("60,000")
         editInterestRate = findViewById(R.id.editInterestRate)
-        editInterestRate.setText("3.50")
         editLoanTerms = findViewById(R.id.editLoanTerms)
-        editLoanTerms.setText("360")
         editMonthlyPayment = findViewById(R.id.editMonthlyPayment)
         toggleLoanAmount = findViewById(R.id.toggleLoanAmount)
         toggleDownPayment = findViewById(R.id.toggleDownPayment)
@@ -51,8 +51,7 @@ class MainActivity : AppCompatActivity() {
         toggleMonthlyPayment = findViewById(R.id.toggleMonthlyPayment)
         spinner = findViewById(R.id.spinnerTerms)
 
-
-
+        initializeEdits()
 
         buttons =
             arrayListOf(toggleLoanAmount, toggleDownPayment, toggleInterestRate, toggleLoanTerms, toggleMonthlyPayment)
@@ -84,7 +83,6 @@ class MainActivity : AppCompatActivity() {
                 button.textOff = createImage(R.drawable.ic_iconfinder_money_322468)
                 button.setOnCheckedChangeListener(checkedChangeListener)
             }
-
         }
 
         editLoanAmount.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editLoanAmount) }))
@@ -114,7 +112,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.mymenu, menu)
@@ -177,6 +174,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
     fun calculateListener() {
         val amount = getDouble(editLoanAmount)
         val downPayment = getDouble(editDownPayment)
@@ -186,7 +184,12 @@ class MainActivity : AppCompatActivity() {
         val selectedTermsUnit = TermsUnit.values().find { it.value == spinner.selectedItemPosition }!!
 
 
-        val loan = Loan(amount, downPayment, interestRate, terms, monthlyPayment, selectedTermsUnit)
+        loan.amount = amount
+        loan.downPayment = downPayment
+        loan.interestRate = interestRate
+        loan.terms = terms
+        loan.monthlyPayment = monthlyPayment
+        loan.termsUnit = selectedTermsUnit
 
 
 
@@ -212,6 +215,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    fun initializeEdits() {
+        editLoanAmount.setText(loan.amount.toString())
+        editDownPayment.setText(loan.downPayment.toString())
+        editInterestRate.setText(loan.interestRate.toString())
+        editLoanTerms.setText(loan.terms.toString())
+    }
 
     fun formatValue(valueOnly: Double?): String? {
         val rounded =

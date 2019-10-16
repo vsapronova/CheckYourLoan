@@ -324,35 +324,47 @@ class Loan(
         monthlyPayment = value
     }
 
-    fun calcParameter(parameter: LoanParameter): Double? {
-        val value: Double? =
-            when (parameter) {
-                LoanParameter.MONTHLY_PAYMENT -> {
-                    calcMonthlyPayment()
-                    monthlyPayment
-                }
-                LoanParameter.DOWN_PAYMENT -> {
-                    calcDownPayment()
-                    downPayment
-
-                }
-                LoanParameter.TOTAL_AMOUNT -> {
-                    calcLoanAmount()
-                    amount
-
-                }
-                LoanParameter.TERMS -> {
-                    calcLoanTerms()
-                    terms
-
-                }
-                LoanParameter.INTEREST_RATE -> {
-                    calcInterestRate()
-                    interestRate
-
-                }
+    fun calcParameter(parameter: LoanParameter) {
+        when (parameter) {
+            LoanParameter.MONTHLY_PAYMENT -> {
+                calcMonthlyPayment()
             }
-        return value
+            LoanParameter.DOWN_PAYMENT -> {
+                calcDownPayment()
+
+            }
+            LoanParameter.TOTAL_AMOUNT -> {
+                calcLoanAmount()
+
+            }
+            LoanParameter.TERMS -> {
+                calcLoanTerms()
+            }
+            LoanParameter.INTEREST_RATE -> {
+                calcInterestRate()
+            }
+        }
+    }
+
+    fun getValue(parameter: LoanParameter): Double? {
+        return when (parameter) {
+            LoanParameter.MONTHLY_PAYMENT -> {
+                monthlyPayment
+            }
+            LoanParameter.DOWN_PAYMENT -> {
+                downPayment
+
+            }
+            LoanParameter.TOTAL_AMOUNT -> {
+                amount
+            }
+            LoanParameter.TERMS -> {
+                terms
+            }
+            LoanParameter.INTEREST_RATE -> {
+                interestRate
+            }
+        }
     }
 }
 

@@ -32,12 +32,11 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var loan: Loan
 
+    var isRunning: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        loan = Loan(amount = 300000.0, downPayment = 60000.0, interestRate = 3.50, terms = 360.0, monthlyPayment = null, termsUnit = TermsUnit.MONTHS)
-
 
         editLoanAmount = findViewById(R.id.editLoanAmount)
         editDownPayment = findViewById(R.id.editDownPayment)
@@ -51,38 +50,26 @@ class MainActivity : AppCompatActivity() {
         toggleMonthlyPayment = findViewById(R.id.toggleMonthlyPayment)
         spinner = findViewById(R.id.spinnerTerms)
 
-        initializeEdits()
 
         buttons =
             arrayListOf(toggleLoanAmount, toggleDownPayment, toggleInterestRate, toggleLoanTerms, toggleMonthlyPayment)
         edits = arrayListOf(editLoanAmount, editDownPayment, editInterestRate, editLoanTerms, editMonthlyPayment)
 
-        for (button in buttons) {
-            if (button == toggleLoanAmount) {
-                button.textOn = createImage(R.drawable.ic_iconfinder_money_bag_309025)
-                button.textOff = createImage(R.drawable.ic_iconfinder_money_bag_309025)
-                button.setOnCheckedChangeListener(checkedChangeListener)
-            }
-            if (button == toggleDownPayment) {
-                button.textOn = createImage(R.drawable.ic_iconfinder_money_box_2639868)
-                button.textOff = createImage(R.drawable.ic_iconfinder_money_box_2639868)
-                button.setOnCheckedChangeListener(checkedChangeListener)
-            }
-            if (button == toggleInterestRate) {
-                button.textOn = createImage(R.drawable.ic_iconfinder_percent_1608788)
-                button.textOff = createImage(R.drawable.ic_iconfinder_percent_1608788)
-                button.setOnCheckedChangeListener(checkedChangeListener)
-            }
-            if (button == toggleLoanTerms) {
-                button.textOn = createImage(R.drawable.ic_iconfinder_gym_2_753128)
-                button.textOff = createImage(R.drawable.ic_iconfinder_gym_2_753128)
-                button.setOnCheckedChangeListener(checkedChangeListener)
-            }
-            if (button == toggleMonthlyPayment) {
-                button.textOn = createImage(R.drawable.ic_iconfinder_money_322468)
-                button.textOff = createImage(R.drawable.ic_iconfinder_money_322468)
-                button.setOnCheckedChangeListener(checkedChangeListener)
-            }
+        val images =
+            arrayListOf(
+                R.drawable.ic_iconfinder_money_bag_309025,
+                R.drawable.ic_iconfinder_money_box_2639868,
+                R.drawable.ic_iconfinder_percent_1608788,
+                R.drawable.ic_iconfinder_gym_2_753128,
+                R.drawable.ic_iconfinder_money_322468
+            )
+
+        for (i in 0..buttons.size-1) {
+            val button = buttons[i]
+            val image = images[i]
+            button.textOn = createImage(image)
+            button.textOff = createImage(image)
+            button.setOnCheckedChangeListener(checkedChangeListener)
         }
 
         editLoanAmount.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editLoanAmount) }))
@@ -90,17 +77,14 @@ class MainActivity : AppCompatActivity() {
         editMonthlyPayment.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editMonthlyPayment) }))
 
         editInterestRate.setFilters(arrayOf<InputFilter>(DecimalDigitsInputFilter(5, 2)))
-        
         editInterestRate.addTextChangedListener(EditWatcher(editInterestRate))
+
         editLoanTerms.addTextChangedListener(EditWatcher(editLoanTerms))
 
         val options = arrayOf("months", "years")
-        spinner.selectedItem
         val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, options)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.setAdapter(adapter)
-
-        selectParameter(LoanParameter.MONTHLY_PAYMENT)
 
         spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -111,6 +95,15 @@ class MainActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
+
+        loan = Loan(amount = 300000.0, downPayment = 60000.0, interestRate = 3.50, terms = 360.0, monthlyPayment = null, termsUnit = TermsUnit.MONTHS)
+
+        // set spinner value from loan.termsUnit and it also should be insice initLoanView
+        selectParameter(LoanParameter.MONTHLY_PAYMENT) // this should be from loan and inside initLoanView
+        initLoanView()
+
+        isRunning = true
+        calculateListener()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -141,7 +134,6 @@ class MainActivity : AppCompatActivity() {
         }
         edits[selectedParameter.value].setTypeface(null, Typeface.BOLD)
         edits[selectedParameter.value].setTextColor(Color.BLACK)
-
 
         calculateListener()
     }
@@ -176,13 +168,14 @@ class MainActivity : AppCompatActivity() {
 
 
     fun calculateListener() {
+        if (!isRunning) return
+
         val amount = getDouble(editLoanAmount)
         val downPayment = getDouble(editDownPayment)
         val interestRate = getDouble(editInterestRate)
         val terms = getDouble(editLoanTerms)
         val monthlyPayment = getDouble(editMonthlyPayment)
         val selectedTermsUnit = TermsUnit.values().find { it.value == spinner.selectedItemPosition }!!
-
 
         loan.amount = amount
         loan.downPayment = downPayment
@@ -191,20 +184,16 @@ class MainActivity : AppCompatActivity() {
         loan.monthlyPayment = monthlyPayment
         loan.termsUnit = selectedTermsUnit
 
-
-
         for (edit in edits) {
             edit.setError(null)
         }
 
-        val edit = edits[selectedParameter.value]
-
         try {
-            val value = loan.calcParameter(selectedParameter)
-            val strValue = formatValue(value)
-            edit.setText(strValue)
+            loan.calcParameter(selectedParameter)
+            initEdit(selectedParameter)
         }
         catch (ex: CalcException) {
+            val edit = edits[selectedParameter.value]
             val errors = ex.errors
             for (error in errors) {
                 edits[error.field.value].setError(error.message)
@@ -212,17 +201,24 @@ class MainActivity : AppCompatActivity() {
             edit.setText("")
             // show error
         }
-
     }
 
-    fun initializeEdits() {
-        editLoanAmount.setText(loan.amount.toString())
-        editDownPayment.setText(loan.downPayment.toString())
-        editInterestRate.setText(loan.interestRate.toString())
-        editLoanTerms.setText(loan.terms.toString())
+    fun initLoanView() {
+        initEdit(LoanParameter.TOTAL_AMOUNT)
+        initEdit(LoanParameter.DOWN_PAYMENT)
+        initEdit(LoanParameter.INTEREST_RATE)
+        initEdit(LoanParameter.TERMS)
+        initEdit(LoanParameter.MONTHLY_PAYMENT)
     }
 
-    fun formatValue(valueOnly: Double?): String? {
+    fun initEdit(parameter: LoanParameter) {
+        val edit = edits[parameter.value]
+        val value = loan.getValue(parameter)
+        val valueStr = formatValue(value, parameter)
+        edit.setText(valueStr)
+    }
+
+    fun formatValue(valueOnly: Double?, selectedParameter: LoanParameter): String {
         val rounded =
             if (valueOnly != null) {
                 when (selectedParameter) {
@@ -242,8 +238,7 @@ class MainActivity : AppCompatActivity() {
                         valueOnly.roundToInt().toString()
                     }
                 }
-
-            } else null
+            } else ""
         return rounded
     }
 

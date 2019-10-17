@@ -24,8 +24,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var toggleInterestRate: ToggleButton
     lateinit var toggleLoanTerms: ToggleButton
     lateinit var toggleMonthlyPayment: ToggleButton
-    lateinit var edits: ArrayList<EditText>
-    lateinit var buttons: ArrayList<ToggleButton>
+    lateinit var edits: Map<LoanParameter, EditText>
+    lateinit var buttons: Map<LoanParameter, ToggleButton>
     lateinit var spinner: Spinner
 
     lateinit var selectedParameter: LoanParameter
@@ -52,24 +52,43 @@ class MainActivity : AppCompatActivity() {
 
 
         buttons =
-            arrayListOf(toggleLoanAmount, toggleDownPayment, toggleInterestRate, toggleLoanTerms, toggleMonthlyPayment)
-        edits = arrayListOf(editLoanAmount, editDownPayment, editInterestRate, editLoanTerms, editMonthlyPayment)
-
-        val images =
-            arrayListOf(
-                R.drawable.ic_iconfinder_money_bag_309025,
-                R.drawable.ic_iconfinder_money_box_2639868,
-                R.drawable.ic_iconfinder_percent_1608788,
-                R.drawable.ic_iconfinder_gym_2_753128,
-                R.drawable.ic_iconfinder_money_322468
+            mapOf(
+                LoanParameter.TOTAL_AMOUNT to toggleLoanAmount,
+                LoanParameter.DOWN_PAYMENT to toggleDownPayment,
+                LoanParameter.INTEREST_RATE to toggleInterestRate,
+                LoanParameter.TERMS to toggleLoanTerms,
+                LoanParameter.MONTHLY_PAYMENT to toggleMonthlyPayment
             )
 
-        for (i in 0..buttons.size-1) {
-            val button = buttons[i]
-            val image = images[i]
+        edits =
+            mapOf(
+                LoanParameter.TOTAL_AMOUNT to editLoanAmount,
+                LoanParameter.DOWN_PAYMENT to editDownPayment,
+                LoanParameter.INTEREST_RATE to editInterestRate,
+                LoanParameter.TERMS to editLoanTerms,
+                LoanParameter.MONTHLY_PAYMENT to editMonthlyPayment
+            )
+
+        val images =
+            mapOf(
+                LoanParameter.TOTAL_AMOUNT to R.drawable.ic_iconfinder_money_bag_309025,
+                LoanParameter.DOWN_PAYMENT to R.drawable.ic_iconfinder_money_box_2639868,
+                LoanParameter.INTEREST_RATE to R.drawable.ic_iconfinder_percent_1608788,
+                LoanParameter.TERMS to R.drawable.ic_iconfinder_gym_2_753128,
+                LoanParameter.MONTHLY_PAYMENT to R.drawable.ic_iconfinder_money_322468
+
+            )
+
+        for (parameter in LoanParameter.values()) {
+            val button = buttons.getValue(parameter)
+            val image = images.getValue(parameter)
             button.textOn = createImage(image)
             button.textOff = createImage(image)
-            button.setOnCheckedChangeListener(checkedChangeListener)
+            button.setOnCheckedChangeListener { checkedButton: CompoundButton, isChecked: Boolean ->
+                if (isChecked) {
+                    loanParameterChecked(parameter)
+                }
+            }
         }
 
         editLoanAmount.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editLoanAmount) }))
@@ -88,7 +107,8 @@ class MainActivity : AppCompatActivity() {
 
         spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                // set selected terms unit to loan
+//                val item = adapter.getItem(position)
+                // TODO: Last problem - set selected terms unit to loan
                 calculateListener()
             }
 
@@ -96,10 +116,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        loan = Loan(amount = 300000.0, downPayment = 60000.0, interestRate = 3.50, terms = 360.0, monthlyPayment = null, termsUnit = TermsUnit.MONTHS)
+        loan = Loan(
+            amount = 300000.0,
+            downPayment = 60000.0,
+            interestRate = 3.50,
+            terms = 360.0,
+            monthlyPayment = null,
+            termsUnit = TermsUnit.MONTHS,
+            calculatedParam = LoanParameter.MONTHLY_PAYMENT
+        )
 
-        // set spinner value from loan.termsUnit and it also should be insice initLoanView
-        selectParameter(LoanParameter.MONTHLY_PAYMENT) // this should be from loan and inside initLoanView
+        // set spinner value from loan.termsUnit and it also should be inside initLoanView
         initLoanView()
 
         isRunning = true
@@ -112,11 +139,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setParameterState(param: LoanParameter, calc: Boolean) {
-        val button = buttons[param.value]
-        button.isEnabled = !calc
+        val button = buttons[param]
+        button!!.isEnabled = !calc
         button.isChecked = calc
 
-        edits[param.value].isEnabled = !calc
+        edits[param]!!.isEnabled = !calc
     }
 
     fun createImage(imageId: Int): SpannableString {
@@ -126,31 +153,29 @@ class MainActivity : AppCompatActivity() {
         return content
     }
 
-    fun selectParameter(param: LoanParameter) {
-        selectedParameter = param
+    fun loanParameterChecked(parameter: LoanParameter) {
+        val edit = edits.getValue(selectedParameter)
+        edit.setTypeface(null, Typeface.NORMAL)
+        edit.setTextColor(Color.BLACK)
+        // TODO: Last problem - set calculated param to loan
+        selectParameter(parameter)
+    }
+
+    fun selectParameter(parameter: LoanParameter) {
+        selectedParameter = parameter
 
         LoanParameter.values().forEach {
             setParameterState(it, calc = selectedParameter == it)
         }
-        edits[selectedParameter.value].setTypeface(null, Typeface.BOLD)
-        edits[selectedParameter.value].setTextColor(Color.BLACK)
+        edits[selectedParameter]!!.setTypeface(null, Typeface.BOLD)
+        edits[selectedParameter]!!.setTextColor(Color.BLACK)
 
         calculateListener()
     }
 
-    val checkedChangeListener = { checkedButton: CompoundButton, isChecked: Boolean ->
-        if (isChecked) {
-            val index = buttons.indexOf(checkedButton)
-            val parameter = LoanParameter.values().find { it.value == index }!!
-            edits[selectedParameter.value].setTypeface(null, Typeface.NORMAL)
-            edits[selectedParameter.value].setTextColor(Color.BLACK)
-            selectParameter(parameter)
-        }
-    }
-
     fun editTextChanged(edit: EditText) {
-        if (edit != edits[selectedParameter.value]) {
-            // set value from edit into loan
+        if (edit != edits[selectedParameter]) {
+            //  TODO: Last problem - set value from edit into loan
             calculateListener()
         }
     }
@@ -184,7 +209,7 @@ class MainActivity : AppCompatActivity() {
         loan.monthlyPayment = monthlyPayment
         loan.termsUnit = selectedTermsUnit
 
-        for (edit in edits) {
+        for (edit  in edits.values) {
             edit.setError(null)
         }
 
@@ -193,17 +218,20 @@ class MainActivity : AppCompatActivity() {
             initEdit(selectedParameter)
         }
         catch (ex: CalcException) {
-            val edit = edits[selectedParameter.value]
+            val edit = edits[selectedParameter]
             val errors = ex.errors
             for (error in errors) {
-                edits[error.field.value].setError(error.message)
+                edits[error.field]!!.setError(error.message)
             }
-            edit.setText("")
+            edit!!.setText("")
             // show error
         }
     }
 
     fun initLoanView() {
+        selectedParameter = loan.calculatedParam
+        loanParameterChecked(loan.calculatedParam)
+
         initEdit(LoanParameter.TOTAL_AMOUNT)
         initEdit(LoanParameter.DOWN_PAYMENT)
         initEdit(LoanParameter.INTEREST_RATE)
@@ -212,7 +240,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun initEdit(parameter: LoanParameter) {
-        val edit = edits[parameter.value]
+        val edit = edits.getValue(parameter)
         val value = loan.getValue(parameter)
         val valueStr = formatValue(value, parameter)
         edit.setText(valueStr)

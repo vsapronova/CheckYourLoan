@@ -8,7 +8,8 @@ class Loan(
     var interestRate: Double?,
     var terms: Double?,
     var monthlyPayment: Double?,
-    var termsUnit: TermsUnit
+    var termsUnit: TermsUnit,
+    var calculatedParam: LoanParameter
 ) {
     val termsInMonths: Double?
         get() = calculateTermsInMonths(termsUnit, terms)

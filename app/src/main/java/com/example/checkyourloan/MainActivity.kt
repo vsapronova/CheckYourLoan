@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.text.*
 import android.text.style.ImageSpan
 import android.view.Menu
@@ -12,21 +13,10 @@ import android.widget.*
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
-
 class MainActivity : AppCompatActivity() {
-    lateinit var editLoanAmount: EditText
-    lateinit var editDownPayment: EditText
-    lateinit var editInterestRate: EditText
-    lateinit var editLoanTerms: EditText
-    lateinit var editMonthlyPayment: EditText
-    lateinit var toggleLoanAmount: ToggleButton
-    lateinit var toggleDownPayment: ToggleButton
-    lateinit var toggleInterestRate: ToggleButton
-    lateinit var toggleLoanTerms: ToggleButton
-    lateinit var toggleMonthlyPayment: ToggleButton
+
     lateinit var edits: Map<LoanParameter, EditText>
     lateinit var buttons: Map<LoanParameter, ToggleButton>
-    lateinit var spinner: Spinner
 
     lateinit var selectedParameter: LoanParameter
 
@@ -34,38 +24,42 @@ class MainActivity : AppCompatActivity() {
 
     var isRunning: Boolean = false
 
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+        super.onSaveInstanceState(outState, outPersistentState)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        editLoanAmount = findViewById(R.id.editLoanAmount)
-        editDownPayment = findViewById(R.id.editDownPayment)
-        editInterestRate = findViewById(R.id.editInterestRate)
-        editLoanTerms = findViewById(R.id.editLoanTerms)
-        editMonthlyPayment = findViewById(R.id.editMonthlyPayment)
-        toggleLoanAmount = findViewById(R.id.toggleLoanAmount)
-        toggleDownPayment = findViewById(R.id.toggleDownPayment)
-        toggleInterestRate = findViewById(R.id.toggleInterestRate)
-        toggleLoanTerms = findViewById(R.id.toggleLoanTerms)
-        toggleMonthlyPayment = findViewById(R.id.toggleMonthlyPayment)
-        spinner = findViewById(R.id.spinnerTerms)
+        val editTotalAmount = findViewById<EditText>(R.id.editLoanAmount)
+        val editDownPayment = findViewById<EditText>(R.id.editDownPayment)
+        val editInterestRate = findViewById<EditText>(R.id.editInterestRate)
+        val editTerms = findViewById<EditText>(R.id.editLoanTerms)
+        val editMonthlyPayment = findViewById<EditText>(R.id.editMonthlyPayment)
+        val toggleTotalAmount = findViewById<ToggleButton>(R.id.toggleLoanAmount)
+        val toggleDownPayment = findViewById<ToggleButton>(R.id.toggleDownPayment)
+        val toggleInterestRate = findViewById<ToggleButton>(R.id.toggleInterestRate)
+        val toggleTerms = findViewById<ToggleButton>(R.id.toggleLoanTerms)
+        val toggleMonthlyPayment = findViewById<ToggleButton>(R.id.toggleMonthlyPayment)
+        val spinner = findViewById<Spinner>(R.id.spinnerTerms)
 
 
         buttons =
             mapOf(
-                LoanParameter.TOTAL_AMOUNT to toggleLoanAmount,
+                LoanParameter.TOTAL_AMOUNT to toggleTotalAmount,
                 LoanParameter.DOWN_PAYMENT to toggleDownPayment,
                 LoanParameter.INTEREST_RATE to toggleInterestRate,
-                LoanParameter.TERMS to toggleLoanTerms,
+                LoanParameter.TERMS to toggleTerms,
                 LoanParameter.MONTHLY_PAYMENT to toggleMonthlyPayment
             )
 
         edits =
             mapOf(
-                LoanParameter.TOTAL_AMOUNT to editLoanAmount,
+                LoanParameter.TOTAL_AMOUNT to editTotalAmount,
                 LoanParameter.DOWN_PAYMENT to editDownPayment,
                 LoanParameter.INTEREST_RATE to editInterestRate,
-                LoanParameter.TERMS to editLoanTerms,
+                LoanParameter.TERMS to editTerms,
                 LoanParameter.MONTHLY_PAYMENT to editMonthlyPayment
             )
 
@@ -86,29 +80,28 @@ class MainActivity : AppCompatActivity() {
             button.textOff = createImage(image)
             button.setOnCheckedChangeListener { checkedButton: CompoundButton, isChecked: Boolean ->
                 if (isChecked) {
-                    loanParameterChecked(parameter)
+                    selectParameter(parameter)
                 }
             }
         }
 
-        editLoanAmount.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editLoanAmount) }))
-        editDownPayment.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editDownPayment) }))
-        editMonthlyPayment.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(editMonthlyPayment) }))
+        editTotalAmount.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(LoanParameter.TOTAL_AMOUNT) }))
+        editDownPayment.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(LoanParameter.DOWN_PAYMENT) }))
+        editMonthlyPayment.addTextChangedListener(MoneyFormatWatcher({ editTextChanged(LoanParameter.MONTHLY_PAYMENT) }))
 
         editInterestRate.setFilters(arrayOf<InputFilter>(DecimalDigitsInputFilter(5, 2)))
-        editInterestRate.addTextChangedListener(EditWatcher(editInterestRate))
+        editInterestRate.addTextChangedListener(EditWatcher(LoanParameter.INTEREST_RATE))
 
-        editLoanTerms.addTextChangedListener(EditWatcher(editLoanTerms))
+        editTerms.addTextChangedListener(EditWatcher(LoanParameter.TERMS))
 
-        val options = arrayOf("months", "years")
-        val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, options)
+        val adapter = ArrayAdapter.createFromResource(this, R.array.termsUnit, android.R.layout.simple_spinner_item)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.setAdapter(adapter)
 
         spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-//                val item = adapter.getItem(position)
-                // TODO: Last problem - set selected terms unit to loan
+                val selectedTermsUnit = TermsUnit.values().find { it.value == spinner.selectedItemPosition }!!
+                loan.termsUnit = selectedTermsUnit
                 calculateListener()
             }
 
@@ -116,22 +109,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        loan = Loan(
-            amount = 300000.0,
-            downPayment = 60000.0,
-            interestRate = 3.50,
-            terms = 360.0,
-            monthlyPayment = null,
-            termsUnit = TermsUnit.MONTHS,
-            calculatedParam = LoanParameter.MONTHLY_PAYMENT
-        )
-
-        // set spinner value from loan.termsUnit and it also should be inside initLoanView
-        initLoanView()
-
-        isRunning = true
-        calculateListener()
+        initLoan(defaultLoan)
     }
+
+    val defaultLoan = Loan(
+        amount = 300000.0,
+        downPayment = 60000.0,
+        interestRate = 3.50,
+        terms = 360.0,
+        monthlyPayment = null,
+        termsUnit = TermsUnit.MONTHS,
+        calculatedParam = LoanParameter.MONTHLY_PAYMENT
+    )
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.mymenu, menu)
@@ -143,7 +132,10 @@ class MainActivity : AppCompatActivity() {
         button!!.isEnabled = !calc
         button.isChecked = calc
 
-        edits[param]!!.isEnabled = !calc
+        val edit = edits[param]!!
+        edit.isEnabled = !calc
+        edit.setTypeface(null, if (calc) Typeface.BOLD else Typeface.NORMAL)
+        edit.setTextColor(Color.BLACK)
     }
 
     fun createImage(imageId: Int): SpannableString {
@@ -153,61 +145,36 @@ class MainActivity : AppCompatActivity() {
         return content
     }
 
-    fun loanParameterChecked(parameter: LoanParameter) {
-        val edit = edits.getValue(selectedParameter)
-        edit.setTypeface(null, Typeface.NORMAL)
-        edit.setTextColor(Color.BLACK)
-        // TODO: Last problem - set calculated param to loan
-        selectParameter(parameter)
-    }
-
     fun selectParameter(parameter: LoanParameter) {
-        selectedParameter = parameter
-
         LoanParameter.values().forEach {
-            setParameterState(it, calc = selectedParameter == it)
+            setParameterState(it, calc = parameter == it)
         }
-        edits[selectedParameter]!!.setTypeface(null, Typeface.BOLD)
-        edits[selectedParameter]!!.setTextColor(Color.BLACK)
+
+        loan.calculatedParam = parameter
+        selectedParameter = parameter
 
         calculateListener()
     }
 
-    fun editTextChanged(edit: EditText) {
-        if (edit != edits[selectedParameter]) {
-            //  TODO: Last problem - set value from edit into loan
+    fun editTextChanged(parameter: LoanParameter) {
+        if (parameter != selectedParameter) {
+            loan.setValue(parameter, getDouble(edits[parameter]!!))
             calculateListener()
         }
     }
 
-    inner class EditWatcher(val edit: EditText) : TextWatcher {
+    inner class EditWatcher(val parameter: LoanParameter) : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
         override fun afterTextChanged(s: Editable) {
-            editTextChanged(edit)
+            editTextChanged(parameter)
         }
     }
 
-
-
     fun calculateListener() {
         if (!isRunning) return
-
-        val amount = getDouble(editLoanAmount)
-        val downPayment = getDouble(editDownPayment)
-        val interestRate = getDouble(editInterestRate)
-        val terms = getDouble(editLoanTerms)
-        val monthlyPayment = getDouble(editMonthlyPayment)
-        val selectedTermsUnit = TermsUnit.values().find { it.value == spinner.selectedItemPosition }!!
-
-        loan.amount = amount
-        loan.downPayment = downPayment
-        loan.interestRate = interestRate
-        loan.terms = terms
-        loan.monthlyPayment = monthlyPayment
-        loan.termsUnit = selectedTermsUnit
 
         for (edit  in edits.values) {
             edit.setError(null)
@@ -224,19 +191,30 @@ class MainActivity : AppCompatActivity() {
                 edits[error.field]!!.setError(error.message)
             }
             edit!!.setText("")
-            // show error
         }
     }
 
+    fun initLoan(loan: Loan) {
+        this.loan = loan
+        initLoanView()
+        calculateListener()
+    }
+
     fun initLoanView() {
+        isRunning = false
+
         selectedParameter = loan.calculatedParam
-        loanParameterChecked(loan.calculatedParam)
+        selectParameter(loan.calculatedParam)
 
         initEdit(LoanParameter.TOTAL_AMOUNT)
         initEdit(LoanParameter.DOWN_PAYMENT)
         initEdit(LoanParameter.INTEREST_RATE)
         initEdit(LoanParameter.TERMS)
         initEdit(LoanParameter.MONTHLY_PAYMENT)
+
+        // TODO: set spinner value from loan.termsUnit and it also should be inside initLoanView
+
+        isRunning = true
     }
 
     fun initEdit(parameter: LoanParameter) {

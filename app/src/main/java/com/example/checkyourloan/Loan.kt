@@ -354,7 +354,6 @@ class Loan(
             }
             LoanParameter.DOWN_PAYMENT -> {
                 downPayment
-
             }
             LoanParameter.TOTAL_AMOUNT -> {
                 amount
@@ -364,6 +363,26 @@ class Loan(
             }
             LoanParameter.INTEREST_RATE -> {
                 interestRate
+            }
+        }
+    }
+
+    fun setValue(parameter: LoanParameter, value: Double?) {
+        when (parameter) {
+            LoanParameter.MONTHLY_PAYMENT -> {
+                monthlyPayment = value
+            }
+            LoanParameter.DOWN_PAYMENT -> {
+                downPayment = value
+            }
+            LoanParameter.TOTAL_AMOUNT -> {
+                amount = value
+            }
+            LoanParameter.TERMS -> {
+                terms = value
+            }
+            LoanParameter.INTEREST_RATE -> {
+                interestRate = value
             }
         }
     }

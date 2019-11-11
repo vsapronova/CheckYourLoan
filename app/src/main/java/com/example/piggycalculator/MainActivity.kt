@@ -1,10 +1,9 @@
-package com.example.checkyourloan
+package com.example.piggycalculator
 
 import android.graphics.Color
 import android.graphics.Typeface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.text.*
 import android.text.style.ImageSpan
 import android.view.Menu
@@ -24,9 +23,20 @@ class MainActivity : AppCompatActivity() {
 
     var isRunning: Boolean = false
 
-    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
-        super.onSaveInstanceState(outState, outPersistentState)
-    }
+
+
+
+
+
+    val defaultLoan = Loan(
+        amount = 300000.0,
+        downPayment = 60000.0,
+        interestRate = 3.50,
+        terms = 360.0,
+        monthlyPayment = null,
+        termsUnit = TermsUnit.MONTHS,
+        calculatedParam = LoanParameter.MONTHLY_PAYMENT
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,16 +122,6 @@ class MainActivity : AppCompatActivity() {
         initLoan(defaultLoan)
     }
 
-    val defaultLoan = Loan(
-        amount = 300000.0,
-        downPayment = 60000.0,
-        interestRate = 3.50,
-        terms = 360.0,
-        monthlyPayment = null,
-        termsUnit = TermsUnit.MONTHS,
-        calculatedParam = LoanParameter.MONTHLY_PAYMENT
-    )
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.mymenu, menu)
         return true
@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun editTextChanged(parameter: LoanParameter) {
-        if (parameter != selectedParameter) {
+        if (parameter != loan.calculatedParam) {
             loan.setValue(parameter, getDouble(edits[parameter]!!))
             calculateListener()
         }
@@ -203,7 +203,7 @@ class MainActivity : AppCompatActivity() {
     fun initLoanView() {
         isRunning = false
 
-        selectedParameter = loan.calculatedParam
+
         selectParameter(loan.calculatedParam)
 
         initEdit(LoanParameter.TOTAL_AMOUNT)

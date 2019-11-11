@@ -1,4 +1,4 @@
-package com.example.checkyourloan
+package com.example.piggycalculator
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4

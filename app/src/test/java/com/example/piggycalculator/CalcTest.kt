@@ -1,11 +1,8 @@
-package com.example.checkyourloan
+package com.example.piggycalculator
 
 
 import org.junit.Assert.*
 import org.junit.Test
-
-import kotlin.test.*
-
 
 
 class CalcTest {

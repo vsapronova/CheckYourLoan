@@ -1,4 +1,4 @@
-package com.example.checkyourloan
+package com.example.piggycalculator
 
 import android.widget.EditText
 

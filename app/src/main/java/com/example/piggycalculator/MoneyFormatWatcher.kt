@@ -1,8 +1,7 @@
-package com.example.checkyourloan
+package com.example.piggycalculator
 
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.EditText
 import java.lang.RuntimeException
 
 class MoneyFormatWatcher(val changeCallback: () -> Unit): TextWatcher {

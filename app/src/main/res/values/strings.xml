@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Check Your Loan</string>
+    <string name="app_name">Piggy Calculator</string>
     <string name="loan_amount">Total amount</string>
     <string name="down_payment">Down payment</string>
     <string name="interest_rate">Interest rate, %</string>

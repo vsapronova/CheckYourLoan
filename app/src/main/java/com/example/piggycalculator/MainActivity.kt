@@ -24,10 +24,6 @@ class MainActivity : AppCompatActivity() {
     var isRunning: Boolean = false
 
 
-
-
-
-
     val defaultLoan = Loan(
         amount = 300000.0,
         downPayment = 60000.0,

@@ -1,4 +1,4 @@
-package com.example.piggycalculator
+package com.piggy.calculator
 
 import android.text.Editable
 import android.text.TextWatcher

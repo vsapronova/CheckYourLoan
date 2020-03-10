@@ -1,4 +1,4 @@
-package com.example.piggycalculator
+package com.piggy.calculator
 
 import kotlin.math.abs
 import kotlin.math.log

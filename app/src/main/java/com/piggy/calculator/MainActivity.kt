@@ -1,4 +1,4 @@
-package com.example.piggycalculator
+package com.piggy.calculator
 
 import android.graphics.Color
 import android.graphics.Typeface
@@ -17,7 +17,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var edits: Map<LoanParameter, EditText>
     lateinit var buttons: Map<LoanParameter, ToggleButton>
 
-    lateinit var selectedParameter: LoanParameter
 
     lateinit var loan: Loan
 
@@ -147,7 +146,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         loan.calculatedParam = parameter
-        selectedParameter = parameter
 
         calculateListener()
     }
@@ -177,11 +175,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         try {
-            loan.calcParameter(selectedParameter)
-            initEdit(selectedParameter)
+            loan.calcParameter(loan.calculatedParam)
+            initEdit(loan.calculatedParam)
         }
         catch (ex: CalcException) {
-            val edit = edits[selectedParameter]
+            val edit = edits[loan.calculatedParam]
             val errors = ex.errors
             for (error in errors) {
                 edits[error.field]!!.setError(error.message)

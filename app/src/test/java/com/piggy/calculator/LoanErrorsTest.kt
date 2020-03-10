@@ -1,4 +1,4 @@
-package com.example.piggycalculator
+package com.piggy.calculator
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -9,7 +9,7 @@ class LoanErrorsTest {
 
     @Test
     fun throwsIfTotalAmountEqualDownPayment() {
-        val loan = Loan(1000.0, 1000.0, null, 24.0, 900.0, TermsUnit.MONTHS)
+        val loan = Loan(1000.0, 1000.0, null, 24.0, 900.0, TermsUnit.MONTHS, LoanParameter.TERMS)
         val ex = assertFailsWith<CalcException>{ loan.calcInterestRate() }
         assertEquals(1, ex.errors.size)
         assertEquals(LoanParameter.TOTAL_AMOUNT, ex.errors[0].field)
@@ -22,7 +22,7 @@ class LoanErrorsTest {
 
     @Test
     fun throwsIfTermsNaN() {
-        val loan = Loan(200000.0, 2000.0, 10.0, null, 1600.0, TermsUnit.MONTHS)
+        val loan = Loan(200000.0, 2000.0, 10.0, null, 1600.0, TermsUnit.MONTHS, LoanParameter.TERMS)
         val ex = assertFailsWith<CalcException>{ loan.calcLoanTerms() }
         assertEquals(1, ex.errors.size)
         assertEquals(LoanParameter.MONTHLY_PAYMENT, ex.errors[0].field )
@@ -35,7 +35,7 @@ class LoanErrorsTest {
 
     @Test
     fun throwsIfTermsInfinity() {
-        val loan = Loan(200000.0, 2000.0, 10.0, null, 1650.0, TermsUnit.MONTHS)
+        val loan = Loan(200000.0, 2000.0, 10.0, null, 1650.0, TermsUnit.MONTHS, LoanParameter.TERMS)
         val ex = assertFailsWith<CalcException>{ loan.calcLoanTerms() }
         assertEquals(1, ex.errors.size)
         assertEquals(LoanParameter.MONTHLY_PAYMENT, ex.errors[0].field )

@@ -1,7 +1,7 @@
-# PiggyCalculator
+# PiggyCalculator                    <img src="icon.png" width = "100">  
 
 
-Android App for loan calculation                                                 <img src="icon.png" width = "100">  
+Android App for loan calculation                                                 
 **Version 1.0**
 
 Simple and convenient design.

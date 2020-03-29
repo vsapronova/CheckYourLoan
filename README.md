@@ -2,8 +2,8 @@
  # PiggyCalculator <img align="left" width = "60" src="icon.png">                      
 
 <br/>
-Android App for loan calculation (Kotlin) 
-                                           
+Android App for loan calculation (Kotlin)
+
 Simple and convenient design.
 
 Calculates any field:

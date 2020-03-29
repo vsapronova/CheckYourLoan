@@ -1,8 +1,7 @@
  
- # PiggyCalculator <img align="left" width = "70" src="icon.png">                      
+ # PiggyCalculator <img align="left" width = "60" src="icon.png">                      
 
-
-
+<br/>
 Android App for loan calculation (Kotlin) 
                                            
 Simple and convenient design.
